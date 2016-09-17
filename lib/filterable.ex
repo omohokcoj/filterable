@@ -2,18 +2,18 @@ defmodule Filterable do
   @moduledoc """
   Filterable allows to map incoming controller parameters to filter functions:
 
-    defmodule Filterable do
-      def title(_conn, query, value) do
-        query |> where(title: ^value)
+      defmodule Filterable do
+        def title(_conn, query, value) do
+          query |> where(title: ^value)
+        end
       end
-    end
 
   Then we can apply defined query params filters inside controller action:
 
-    def index(conn, params) do
-      posts = Post |> apply_filters(conn) |> Repo.all
-      render(conn, "index.html", posts: posts)
-    end
+      def index(conn, params) do
+        posts = Post |> apply_filters(conn) |> Repo.all
+        render(conn, "index.html", posts: posts)
+      end
 
   """
 
@@ -54,7 +54,7 @@ defmodule Filterable do
   @doc """
   Allows to select `module` with defined filter functions
 
-    filterable AvaliableFilters
+      filterable AvaliableFilters
 
   """
   defmacro filterable(module) do
