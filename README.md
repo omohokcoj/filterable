@@ -7,7 +7,7 @@ Filterable allows to map incoming controller parameters to filter functions.
 Add `filterable` to your mix.exs.
 
 ```elixir
-{:filterable, "~> 0.0.2"}
+{:filterable, "~> 0.0.3"}
 ```
 
 Then `use` Filterable module inside controller or make it available for all application controllers by adding it to `web.ex`:

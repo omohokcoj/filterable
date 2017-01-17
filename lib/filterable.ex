@@ -19,6 +19,13 @@ defmodule Filterable do
   Other module can be set explicitly with `filterable` macro:
 
       filterable UserFilters, param: "filter"
+
+  Also can be used as raw function:
+
+      def index(conn, params) do
+        posts = Post |> Filterable.apply_filters(conn, FiltersModule) |> Repo.all
+        render(conn, "index.html", posts: posts)
+      end
   """
 
   @doc false
@@ -32,35 +39,11 @@ defmodule Filterable do
     end
   end
 
-  @lint false
   @doc false
   defmacro __before_compile__(_) do
     quote do
       def apply_filters(query, conn) do
-        defined_filters = @filters_module.__info__(:functions)
-
-        Enum.reduce(defined_filters, query, fn ({filter_name, args_num}, query) ->
-          param_name = Atom.to_string(filter_name)
-          value = conn |> filter_params |> Map.get(param_name)
-          try do
-            cond do
-              args_num == 2 && !value ->
-                apply(@filters_module, filter_name, [conn, query])
-              args_num == 3 && value ->
-                apply(@filters_module, filter_name, [conn, query, value])
-              true -> query
-            end
-          rescue
-            FunctionClauseError -> query
-          end
-        end)
-      end
-
-      def filter_params(%{params: params}) do
-        case Keyword.get(@filter_options, :param) do
-          nil -> params
-          key -> Map.get(params, key, %{})
-        end
+        unquote(__MODULE__).apply_filters(query, conn, @filters_module, @filter_options)
       end
     end
   end
@@ -72,10 +55,34 @@ defmodule Filterable do
 
     * `:param` - Sets top level query param for filters.
   """
-  defmacro filterable(module, options \\ []) do
+  defmacro filterable(module, opts \\ []) do
     quote do
       @filters_module unquote(module)
-      @filter_options unquote(options)
+      @filter_options unquote(opts)
     end
+  end
+
+  @doc """
+  Applies filters on `query` using filter function defined in `module`
+  """
+  def apply_filters(query, conn, module, opts \\ []) do
+    params_key = Keyword.get(opts, :param)
+    defined_filters = module.__info__(:functions)
+
+    Enum.reduce(defined_filters, query, fn ({filter_name, args_num}, query) ->
+      param_name = Atom.to_string(filter_name)
+      value = conn.params |> Map.get(params_key, %{}) |> Map.get(param_name)
+      try do
+        cond do
+          args_num == 2 && !value ->
+            apply(module, filter_name, [conn, query])
+          args_num == 3 && value ->
+            apply(module, filter_name, [conn, query, value])
+          true -> query
+        end
+      rescue
+        FunctionClauseError -> query
+      end
+    end)
   end
 end

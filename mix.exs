@@ -3,7 +3,7 @@ defmodule Filterable.Mixfile do
 
   def project do
     [app: :filterable,
-     version: "0.0.2",
+     version: "0.0.3",
      elixir: "~> 1.2",
      description: description,
      package: package,
