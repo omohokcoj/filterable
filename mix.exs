@@ -3,7 +3,7 @@ defmodule Filterable.Mixfile do
 
   def project do
     [app: :filterable,
-     version: "0.0.1",
+     version: "0.0.2",
      elixir: "~> 1.2",
      description: description,
      package: package,
@@ -17,7 +17,8 @@ defmodule Filterable.Mixfile do
   end
 
   defp deps do
-    [{:ex_doc, "~> 0.11", only: :dev}]
+    [{:ex_doc, "~> 0.11", only: :dev},
+     {:credo, "~> 0.5", only: [:dev, :test]}]
   end
 
   defp description do

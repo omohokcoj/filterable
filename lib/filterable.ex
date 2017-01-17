@@ -15,6 +15,10 @@ defmodule Filterable do
         render(conn, "index.html", posts: posts)
       end
 
+  By default `apply_filters` uses filter functions defined in `AppName.ControllerModule.Filterable` module.
+  Other module can be set explicitly with `filterable` macro:
+
+      filterable UserFilters, param: "filter"
   """
 
   @doc false
@@ -24,9 +28,11 @@ defmodule Filterable do
 
       @before_compile unquote(__MODULE__)
       @filters_module Module.concat([__MODULE__, unquote(__MODULE__)])
+      @filter_options []
     end
   end
 
+  @lint false
   @doc false
   defmacro __before_compile__(_) do
     quote do
@@ -34,7 +40,8 @@ defmodule Filterable do
         defined_filters = @filters_module.__info__(:functions)
 
         Enum.reduce(defined_filters, query, fn ({filter_name, args_num}, query) ->
-          value = conn.params[Atom.to_string(filter_name)]
+          param_name = Atom.to_string(filter_name)
+          value = conn |> filter_params |> Map.get(param_name)
           try do
             cond do
               args_num == 2 && !value ->
@@ -48,18 +55,27 @@ defmodule Filterable do
           end
         end)
       end
+
+      def filter_params(%{params: params}) do
+        case Keyword.get(@filter_options, :param) do
+          nil -> params
+          key -> Map.get(params, key, %{})
+        end
+      end
     end
   end
 
   @doc """
-  Allows to select `module` with defined filter functions
+  Allows to select `module` with defined filter functions with options.
 
-      filterable AvaliableFilters
+  ## Options
 
+    * `:param` - Sets top level query param for filters.
   """
-  defmacro filterable(module) do
+  defmacro filterable(module, options \\ []) do
     quote do
       @filters_module unquote(module)
+      @filter_options unquote(options)
     end
   end
 end

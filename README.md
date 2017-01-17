@@ -7,7 +7,7 @@ Filterable allows to map incoming controller parameters to filter functions.
 Add `filterable` to your mix.exs.
 
 ```elixir
-{:filterable, "~> 0.0.1"}
+{:filterable, "~> 0.0.2"}
 ```
 
 Then `use` Filterable module inside controller or make it available for all application controllers by adding it to `web.ex`:
@@ -29,10 +29,10 @@ Common usage:
 
 ```elixir
 defmodule Application.PostController do
-  use Conglomoo.Web, :controller
+  use MyApp.Web, :controller
   use Filterable
 
-  alias Conglomoo.Post
+  alias MyApp.Post
 
   defmodule Filterable do
     def title(_conn, query, value) do
@@ -69,7 +69,7 @@ defmodule AvailableFilters do
 end
 ```
 
-Then we can map filter functions from this module by calling `filterable` macro inside controller:
+Then we can link filter functions from this module by calling `filterable` macro inside controller:
 
 ```elixir
 defmodule Application.PostController do
@@ -83,6 +83,14 @@ defmodule Application.PostController do
   end
 end
 ```
+
+Also we can specify top level filters query param with `filterable` marco:
+
+```elixir
+  filterable AvailableFilters, param: "filter"
+```
+
+This could be useful for working with [json-api](http://jsonapi.org/format/#fetching-filtering) filters query.
 
 ## Contribution
 
