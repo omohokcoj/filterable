@@ -63,15 +63,15 @@ defmodule Filterable do
   end
 
   @doc """
-  Applies filters on `query` using filter function defined in `module`
+  Applies filters on `query` using filter function defined in `module`.
   """
   def apply_filters(query, conn, module, opts \\ []) do
-    params_key = Keyword.get(opts, :param)
     defined_filters = module.__info__(:functions)
+    params = fetch_params(conn, opts)
 
     Enum.reduce(defined_filters, query, fn ({filter_name, args_num}, query) ->
       param_name = Atom.to_string(filter_name)
-      value = conn.params |> Map.get(params_key, %{}) |> Map.get(param_name)
+      value = Map.get(params, param_name)
       try do
         cond do
           args_num == 2 && !value ->
@@ -84,5 +84,15 @@ defmodule Filterable do
         FunctionClauseError -> query
       end
     end)
+  end
+
+  @doc """
+  Fetches query params from conn. Returns nested map if `:param` option set
+  """
+  defp fetch_params(%{params: params}, opts \\ []) do
+    case Keyword.get(opts, :param) do
+      nil -> params
+      key -> Map.get(params, key, %{})
+    end
   end
 end
