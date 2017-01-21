@@ -1,60 +1,32 @@
 defmodule Filterable do
-  @moduledoc """
-  Filterable allows to map incoming controller parameters to filter functions:
+  alias Filterable.Params
 
-      defmodule Filterable do
-        def title(_conn, query, value) do
-          query |> where(title: ^value)
-        end
-      end
+  @default_options [allow_blank: false, allow_nil: false, trim: true, default: nil, cast: nil]
 
-  Then we can apply defined query params filters inside controller action:
-
-      def index(conn, params) do
-        posts = Post |> apply_filters(conn) |> Repo.all
-        render(conn, "index.html", posts: posts)
-      end
-
-  By default `apply_filters` uses filter functions defined in `AppName.ControllerModule.Filterable` module.
-  Other module can be set explicitly with `filterable` macro:
-
-      filterable UserFilters, param: "filter"
-
-  Also can be used as raw function:
-
-      def index(conn, params) do
-        posts = Post |> Filterable.apply_filters(conn, FiltersModule) |> Repo.all
-        render(conn, "index.html", posts: posts)
-      end
-  """
-
-  @doc false
   defmacro __using__(_) do
     quote do
       import unquote(__MODULE__)
 
       @before_compile unquote(__MODULE__)
-      @filters_module Module.concat([__MODULE__, unquote(__MODULE__)])
+      @filters_module __MODULE__
       @filter_options []
     end
   end
 
-  @doc false
   defmacro __before_compile__(_) do
     quote do
-      def apply_filters(query, conn) do
-        unquote(__MODULE__).apply_filters(query, conn, @filters_module, @filter_options)
+      def apply_filters(queryable, params, opts \\ []) do
+        options = Keyword.merge(opts, @filter_options)
+        @filters_module.apply_filters(queryable, params, options)
+      end
+
+      def filter_values(params, opts \\ []) do
+        options = Keyword.merge(opts, @filter_options)
+        @filters_module.filter_values(params, options)
       end
     end
   end
 
-  @doc """
-  Allows to select `module` with defined filter functions with options.
-
-  ## Options
-
-    * `:param` - Sets top level query param for filters.
-  """
   defmacro filterable(module, opts \\ []) do
     quote do
       @filters_module unquote(module)
@@ -62,37 +34,41 @@ defmodule Filterable do
     end
   end
 
-  @doc """
-  Applies filters on `query` using filter function defined in `module`.
-  """
-  def apply_filters(query, conn, module, opts \\ []) do
-    defined_filters = module.__info__(:functions)
-    params = fetch_params(conn, opts)
+  def apply_filters(queryable, params, module, opts \\ []) do
+    shares = Keyword.get(opts, :shares)
+    values = filter_values(params, module, opts)
 
-    Enum.reduce(defined_filters, query, fn ({filter_name, args_num}, query) ->
-      param_name = Atom.to_string(filter_name)
-      value = Map.get(params, param_name)
+    module.defined_filters
+    |> Enum.reduce(queryable, fn ({filter_name, filter_options}, queryable) ->
+      value     = Keyword.get(values, filter_name)
+      allow_nil = Keyword.get(filter_options, :allow_nil)
+
       try do
         cond do
-          args_num == 2 && !value ->
-            apply(module, filter_name, [conn, query])
-          args_num == 3 && value ->
-            apply(module, filter_name, [conn, query, value])
-          true -> query
+          (allow_nil || value) && shares ->
+            apply(module, filter_name, [queryable, value, shares])
+          allow_nil || value ->
+            apply(module, filter_name, [queryable, value])
+          true -> queryable
         end
       rescue
-        FunctionClauseError -> query
+        FunctionClauseError -> queryable
       end
     end)
   end
 
-  @doc """
-  Fetches query params from conn. Returns nested map if `:param` option set
-  """
-  defp fetch_params(%{params: params}, opts \\ []) do
-    case Keyword.get(opts, :param) do
-      nil -> params
-      key -> Map.get(params, key, %{})
-    end
+  def filter_values(params, module, opts \\ []) do
+    module.defined_filters
+    |> Enum.reduce([], fn ({filter_name, filter_options}, list) ->
+      options =
+        [param: filter_name]
+        |> Keyword.merge(@default_options)
+        |> Keyword.merge(filter_options)
+        |> Keyword.merge(opts)
+
+      value = Params.filter_value(params, options)
+
+      list ++ [{filter_name, value}]
+    end)
   end
 end

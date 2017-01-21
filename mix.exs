@@ -5,15 +5,17 @@ defmodule Filterable.Mixfile do
     [app: :filterable,
      version: "0.0.4",
      elixir: "~> 1.2",
-     description: description,
-     package: package,
-     deps: deps,
+     description: description(),
+     package: package(),
+     deps: deps(),
+     build_embedded: Mix.env == :prod,
+     start_permanent: Mix.env == :prod,
      docs: &docs/0
    ]
   end
 
   def application do
-    [applications: [:logger]]
+    [extra_applications: [:logger]]
   end
 
   defp deps do
@@ -23,7 +25,7 @@ defmodule Filterable.Mixfile do
 
   defp description do
     """
-    Simple query params filtering for Phoenix framework.
+    Filterable allows to map incoming parameters to filter functions.
     """
   end
 
