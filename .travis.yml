@@ -6,3 +6,7 @@ otp_release:
   - 19.2
   - 18.3
 sudo: false
+env:
+  - MIX_ENV=test
+script:
+  - "mix do deps.get, compile, coveralls.travis"

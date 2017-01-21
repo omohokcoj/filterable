@@ -11,8 +11,8 @@ defmodule Filterable.ParamsTest do
     value = filter_value(params, param: :name)
     assert value == "Tom"
 
-    value = filter_value(params, param: :age)
-    assert value == 23
+    value = filter_value(%{"cool" => true}, param: :cool)
+    assert value == true
 
     value = filter_value(params, param: :friends)
     assert value == ["Jonny"]

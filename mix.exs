@@ -10,6 +10,8 @@ defmodule Filterable.Mixfile do
      deps: deps(),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     test_coverage: [tool: ExCoveralls],
+     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.travis": :test, "coveralls.html": :test],
      docs: &docs/0
    ]
   end
@@ -20,7 +22,8 @@ defmodule Filterable.Mixfile do
 
   defp deps do
     [{:ex_doc, "~> 0.11", only: :dev},
-     {:credo, "~> 0.5", only: [:dev, :test]}]
+     {:credo, "~> 0.5", only: [:dev, :test]},
+     {:excoveralls, "~> 0.5", only: :test}]
   end
 
   defp description do
