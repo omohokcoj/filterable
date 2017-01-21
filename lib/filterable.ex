@@ -35,18 +35,18 @@ defmodule Filterable do
   end
 
   def apply_filters(queryable, params, module, opts \\ []) do
-    shares = Keyword.get(opts, :shares)
+    share  = Keyword.get(opts, :share)
     values = filter_values(params, module, opts)
 
     module.defined_filters
-    |> Enum.reduce(queryable, fn ({filter_name, filter_options}, queryable) ->
+    |> Enum.reduce(queryable, fn ({filter_name, filter_opts}, queryable) ->
       value     = Keyword.get(values, filter_name)
-      allow_nil = Keyword.get(filter_options, :allow_nil)
+      allow_nil = Keyword.get(filter_opts, :allow_nil)
 
       try do
         cond do
-          (allow_nil || value) && shares ->
-            apply(module, filter_name, [queryable, value, shares])
+          (allow_nil || value) && share ->
+            apply(module, filter_name, [queryable, value, share])
           allow_nil || value ->
             apply(module, filter_name, [queryable, value])
           true -> queryable
@@ -59,11 +59,11 @@ defmodule Filterable do
 
   def filter_values(params, module, opts \\ []) do
     module.defined_filters
-    |> Enum.reduce([], fn ({filter_name, filter_options}, list) ->
+    |> Enum.reduce([], fn ({filter_name, filter_opts}, list) ->
       options =
         [param: filter_name]
         |> Keyword.merge(@default_options)
-        |> Keyword.merge(filter_options)
+        |> Keyword.merge(filter_opts)
         |> Keyword.merge(opts)
 
       value = Params.filter_value(params, options)
