@@ -1,4 +1,4 @@
-# Filterable
+# Filterable [![Build Status](https://travis-ci.org/omohokcoj/filterable.svg?branch=master)](https://travis-ci.org/omohokcoj/filterable)
 
 Filterable allows to map incoming parameters to filter functions.
 The goal is to provide minimal DSL for building filters using mostly pure elixir syntax.
