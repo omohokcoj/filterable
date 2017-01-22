@@ -1,8 +1,5 @@
-defmodule Filterable.ParamFilters do
+defmodule ParamFilters do
   use Filterable.DSL
-  use Filterable
-
-  filterable __MODULE__, allow_nil: true
 
   alias Filterable.Utils
 

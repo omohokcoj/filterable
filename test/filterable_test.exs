@@ -1,7 +1,8 @@
 defmodule FilterableTest do
   use ExUnit.Case
+  use Filterable
 
-  import Filterable.ParamFilters, only: [apply_filters: 2]
+  filterable ParamFilters, allow_nil: true
 
   setup_all do
     {:ok, %{name: "Tom", bio: "  was born", age: 23, friends: ["Jonny"],
