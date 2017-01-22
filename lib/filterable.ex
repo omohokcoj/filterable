@@ -17,12 +17,12 @@ defmodule Filterable do
     quote do
       def apply_filters(queryable, params, opts \\ []) do
         options = Keyword.merge(opts, @filter_options)
-        @filters_module.apply_filters(queryable, params, options)
+        apply_filters(queryable, params, @filters_module, options)
       end
 
       def filter_values(params, opts \\ []) do
         options = Keyword.merge(opts, @filter_options)
-        @filters_module.filter_values(params, options)
+        filter_values(params, @filters_module, options)
       end
     end
   end
@@ -35,13 +35,15 @@ defmodule Filterable do
   end
 
   def apply_filters(queryable, params, module, opts \\ []) do
-    share  = Keyword.get(opts, :share)
     values = filter_values(params, module, opts)
 
     module.defined_filters
     |> Enum.reduce(queryable, fn ({filter_name, filter_opts}, queryable) ->
+      options = Keyword.merge(opts, filter_opts)
+
       value     = Keyword.get(values, filter_name)
-      allow_nil = Keyword.get(filter_opts, :allow_nil)
+      share     = Keyword.get(options, :share)
+      allow_nil = Keyword.get(options, :allow_nil)
 
       try do
         cond do

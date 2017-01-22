@@ -18,7 +18,11 @@ defmodule Filterable.DSL do
         Filterable.filter_values(params, __MODULE__, opts)
       end
 
-      def defined_filters, do: Enum.reverse(@filters)
+      def defined_filters do
+        Enum.reverse(@filters)
+      end
+
+      defoverridable [apply_filters: 3, filter_values: 2]
     end
   end
 
@@ -29,8 +33,8 @@ defmodule Filterable.DSL do
 
   defp define_filter(filter_name, head, body) do
     quote do
-      options = Module.get_attribute(__MODULE__, :options) || []
-      @filters Keyword.put_new(@filters, unquote(filter_name), options)
+      options = Module.get_attribute(__MODULE__, :options)
+      @filters Keyword.put_new(@filters, unquote(filter_name), options || [])
       Module.delete_attribute(__MODULE__, :options)
 
       def unquote(head), do: unquote(body)

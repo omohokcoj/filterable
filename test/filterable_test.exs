@@ -5,7 +5,7 @@ defmodule FilterableTest do
 
   setup_all do
     {:ok, %{name: "Tom", bio: "  was born", age: 23, friends: ["Jonny"],
-            enemies: [], skills: %{"vox" => 1}, fun: &is_bitstring/1, address: " "}}
+            enemies: [], skills: %{"vox" => 1}, address: " "}}
   end
 
   test "returns filter value", params do
@@ -70,5 +70,10 @@ defmodule FilterableTest do
 
     value = apply_filters(params, param: :name, cast: [&String.downcase/1, &String.to_atom/1])
     assert value == :tom
+  end
+
+  test "returns shared value", params do
+    value = apply_filters(params, param: :name, share: true)
+    assert value == "shared"
   end
 end

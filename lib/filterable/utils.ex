@@ -1,8 +1,9 @@
 defmodule Filterable.Utils do
-  def get_indifferent(map, key) when is_map(map),
-    do: Map.get(map, key) || Map.get(map, swap_key_type(key))
-  def get_indifferent(list, key) when is_list(list),
-    do: Keyword.get(list, key)
+  def get_indifferent(collection, key, default \\ nil)
+  def get_indifferent(map, key, default) when is_map(map),
+    do: Map.get(map, key, default) || Map.get(map, swap_key_type(key), default)
+  def get_indifferent(list, key, default) when is_list(list),
+    do: Keyword.get(list, key, default)
 
   defp swap_key_type(key) when is_bitstring(key),
     do: String.to_atom(key)
