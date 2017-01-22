@@ -1,8 +1,8 @@
 # Filterable [![Build Status](https://travis-ci.org/omohokcoj/filterable.svg?branch=master)](https://travis-ci.org/omohokcoj/filterable) [![Code Climate](https://codeclimate.com/github/omohokcoj/filterable/badges/gpa.svg)](https://codeclimate.com/github/omohokcoj/filterable) [![Coverage Status](https://coveralls.io/repos/github/omohokcoj/filterable/badge.svg?branch=master)](https://coveralls.io/github/omohokcoj/filterable?branch=master)
 
-[Filterable](https://github.com/omohokcoj/filterable) allows to map incoming parameters to filter functions.
-The goal is to provide minimal and easy to use DSL for building filters using pure elixir.
-[Filterable](https://github.com/omohokcoj/filterable) doesn't depend on external libraries or frameworks and can be used both with [Phoenix](https://github.com/phoenixframework/phoenix) and pure elixir projects.
+Filterable allows to map incoming parameters to filter functions.
+The goal is to provide minimal and easy to use DSL for building filters using pure Elixir.
+Filterable doesn't depend on external libraries or frameworks and can be used both with Phoenix and pure Elixir projects.
 Inspired by [has_scope](https://github.com/plataformatec/has_scope).
 
 ## Installation
@@ -18,21 +18,21 @@ Add `filterable` to your mix.exs.
 Common usage:
 
 ```elixir
-defmodule UserFilters do
+defmodule RepoFilters do
   use Filterable.DSL
 
   filter name(list, value) do
-    list |> Enum.filter &(&1.name == value)
+    list |> Enum.filter(& &1.name == value)
   end
 
   filter stars(list, value) do
-    list |> Enum.filter &(&1.stars >= value)
+    list |> Enum.filter(& &1.stars >= value)
   end
 end
 
 repos = [%{name: "phoenix", stars: 8565}, %{name: "ecto", start: 2349}]
 
-UserFilters.apply_filters(repos, %{name: "phoenix", stars: 8000})
+RepoFilters.apply_filters(repos, %{name: "phoenix", stars: 8000})
 ```
 
 Phoenix usage:
@@ -42,8 +42,8 @@ defmodule MyApp.PostController do
   use MyApp.Web, :controller
   use Filterable.DSL
 
-  @options default: "current_user"
-  filter author(query, value, current_user) when value == "current_user" do
+  @options allow_nil: true
+  filter author(query, value, current_user) when is_nil(value) do
     query |> where(author_id: ^current_user.id)
   end
   filter author(query, value, _current_user) do
