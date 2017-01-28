@@ -62,6 +62,7 @@ end
 - [X] Coverage 100%
 - [ ] Update README
 - [ ] Documentation
+- [ ] Improve tests
 
 ## Contribution
 

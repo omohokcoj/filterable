@@ -5,7 +5,7 @@ defmodule Filterable do
 
   defmacro __using__(_) do
     quote do
-      import unquote(__MODULE__)
+      import unquote(__MODULE__), only: [filterable: 2, filterable: 1]
 
       @before_compile unquote(__MODULE__)
       @filters_module __MODULE__
@@ -17,12 +17,12 @@ defmodule Filterable do
     quote do
       def apply_filters(queryable, params, opts \\ []) do
         options = Keyword.merge(opts, @filter_options)
-        apply_filters(queryable, params, @filters_module, options)
+        Filterable.apply_filters(queryable, params, @filters_module, options)
       end
 
       def filter_values(params, opts \\ []) do
         options = Keyword.merge(opts, @filter_options)
-        filter_values(params, @filters_module, options)
+        Filterable.filter_values(params, @filters_module, options)
       end
     end
   end
