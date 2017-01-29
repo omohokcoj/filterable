@@ -46,7 +46,7 @@ defmodule Filterable.ParamsTest do
     assert value == %{name: "Tom", friends: ["Jonny"]}
 
     value = filter_value(params, param: :keywords, trim: true, allow_blank: true)
-    assert value == [two: [""], one: 1]
+    assert value == [one: 1, two: [""]]
   end
 
   test "returns nilifed value", params do
@@ -74,7 +74,7 @@ defmodule Filterable.ParamsTest do
     assert value == %{"vox" => 1, "piano" => ""}
 
     value = filter_value(params, param: :keywords, trim: true, allow_blank: true)
-    assert value == [two: [""], one: 1]
+    assert value == [one: 1, two: [""]]
   end
 
   test "returns default value", params do

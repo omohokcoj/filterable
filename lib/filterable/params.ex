@@ -108,16 +108,16 @@ defmodule Filterable.Params do
     value
   end
 
-  defp cast_value(value, cast) when is_list(value) do
+  defp cast_value(value, cast) when is_list(value) and not is_nil(cast) do
     if Keyword.keyword?(value) do
       Enum.reduce value, [], fn ({k, v}, acc) ->
-        Keyword.put(acc, k, cast_value(v, cast))
+        acc ++ [{k, cast_value(v, cast)}]
       end
     else
       Enum.map(value, &cast_value(&1, cast))
     end
   end
-  defp cast_value(value, cast) when is_map(value) do
+  defp cast_value(value, cast) when is_map(value) and not is_nil(cast) do
     Enum.reduce value, %{}, fn ({k, v}, acc) ->
       Map.put(acc, k, cast_value(v, cast))
     end
