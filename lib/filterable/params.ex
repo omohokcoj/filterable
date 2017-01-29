@@ -84,25 +84,25 @@ defmodule Filterable.Params do
     value
   end
 
-  defp default_value(value, default_value) when is_list(value) and is_list(default_value) do
-    if Keyword.keyword?(value) && Keyword.keyword?(default_value) do
-      Keyword.merge(default_value, value)
+  defp default_value(value, default) when is_list(value) and is_list(default) do
+    if Keyword.keyword?(value) && Keyword.keyword?(default) do
+      Keyword.merge(default, value)
     else
       value
     end
   end
-  defp default_value(value, default_value) when is_map(value) and is_list(default_value) do
-    if Keyword.keyword?(default_value) do
-      default_value |> Enum.into(%{}) |> Map.merge(value)
+  defp default_value(value, default) when is_map(value) and is_list(default) do
+    if Keyword.keyword?(default) do
+      default |> Enum.into(%{}) |> Map.merge(value)
     else
       value
     end
   end
-  defp default_value(value, default_value) when is_map(value) and is_map(default_value) do
-    Map.merge(default_value, value)
+  defp default_value(value, default) when is_map(value) and is_map(default) do
+    Map.merge(default, value)
   end
-  defp default_value(value, default_value) when is_nil(value) do
-    default_value
+  defp default_value(value, default) when is_nil(value) do
+    default
   end
   defp default_value(value, _) do
     value

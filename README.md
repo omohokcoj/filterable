@@ -59,7 +59,7 @@ end
 
 ## TODO:
 
-- [X] Coverage 100%
+- [ ] Coverage 100%
 - [ ] Update README
 - [ ] Documentation
 - [ ] Improve tests
