@@ -22,7 +22,7 @@ defmodule Filterable.DSL do
         Enum.reverse(@filters)
       end
 
-      defoverridable [apply_filters: 3, filter_values: 2]
+      defoverridable [apply_filters: 3, apply_filters: 2, filter_values: 2, filter_values: 1]
     end
   end
 

@@ -11,8 +11,8 @@ defmodule Filterable.Params do
     |> fetch_value(param_key)
     |> trim_value(trim_opt)
     |> nilify_value(allow_blank_opt)
-    |> default_value(default_opt)
     |> cast_value(cast_opt)
+    |> default_value(default_opt)
   end
 
   defp fetch_options(opts) do

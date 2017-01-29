@@ -91,7 +91,7 @@ defmodule Filterable.ParamsTest do
     assert value == %{"vox" => 1, piano: "test"}
 
     value = filter_value(params, param: :keywords, trim: true, default: [two: 2])
-    assert value == [one: 1, two: 2]
+    assert value == [two: 2, one: 1]
   end
 
   test "doesn't return default value when value present", params do

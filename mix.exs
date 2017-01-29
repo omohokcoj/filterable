@@ -2,7 +2,7 @@ defmodule Filterable.Mixfile do
   use Mix.Project
 
   @project_url "https://github.com/omohokcoj/filterable"
-  @version "0.1.1"
+  @version "0.1.2"
 
   def project do
     [app: :filterable,
