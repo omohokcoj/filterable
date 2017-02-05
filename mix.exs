@@ -8,17 +8,18 @@ defmodule Filterable.Mixfile do
     [app: :filterable,
      version: @version,
      elixir: "~> 1.3",
-     description: description(),
      source_url: @project_url,
      homepage_url: @project_url,
+     description: description(),
      elixirc_paths: elixirc_paths(Mix.env),
      package: package(),
      deps: deps(),
+     aliases: aliases(),
+     docs: docs(),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.travis": :test, "coveralls.html": :test],
-     docs: docs()
+     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.travis": :test, "coveralls.html": :test]
    ]
   end
 
@@ -29,7 +30,10 @@ defmodule Filterable.Mixfile do
   defp deps do
     [{:ex_doc, "~> 0.11", only: :dev},
      {:credo, "~> 0.5", only: [:dev, :test]},
-     {:excoveralls, "~> 0.5", only: :test}]
+     {:excoveralls, "~> 0.5", only: :test},
+     {:plug, "~> 1.1.2", only: :test},
+     {:postgrex, ">= 0.0.0", only: :test},
+     {:ecto, "~> 2.1", only: :test}]
   end
 
   defp description do
@@ -53,9 +57,15 @@ defmodule Filterable.Mixfile do
   defp elixirc_paths(), do: ~w(lib)
 
   defp docs do
-    {ref, 0} = System.cmd("git", ["rev-parse", "--verify", "--quiet", "HEAD"])
-    [source_ref: ref,
+    [source_ref: System.cmd("git", ["rev-parse", "--verify", "--quiet", "HEAD"]),
      main: "readme",
      extras: ["README.md"]]
+  end
+
+  defp aliases do
+    ["ecto.seed": "run priv/repo/seeds.exs",
+     "ecto.setup": ["ecto.create", "ecto.migrate", "ecto.seed"],
+     "ecto.reset": ["ecto.drop", "ecto.setup"],
+     "test": ["ecto.create --quiet", "ecto.migrate", "test"]]
   end
 end

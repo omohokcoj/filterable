@@ -1,4 +1,4 @@
-defmodule UserFilters do
+defmodule Filterable.UserListFilters do
   use Filterable.DSL
 
   filter name(list, value) do

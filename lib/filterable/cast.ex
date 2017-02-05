@@ -68,7 +68,7 @@ defmodule Filterable.Cast do
       {:error, _} -> nil
     end
   end
-  def datetime(%Date{} = value) do
+  def date(%Date{} = value) do
     value
   end
   def date(_) do
