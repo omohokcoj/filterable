@@ -9,6 +9,16 @@ defmodule Filterable.Cast do
     value
   end
 
+  def string(value) when is_integer(value) do
+    Integer.to_string(value)
+  end
+  def string(value) when is_float(value) do
+    Float.to_string(value)
+  end
+  def string(value) when is_atom(value) do
+    Atom.to_string(value)
+  end
+
   def atom(value) when is_bitstring(value) do
     String.to_atom(value)
   end

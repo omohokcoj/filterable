@@ -68,16 +68,18 @@ defmodule Filterable.Params do
   end
   defp nilify_value(value) when is_list(value) do
     if Keyword.keyword?(value) do
-      Enum.filter(value, fn ({_, v}) -> nilify_value(v) end)
+      Enum.reduce value, [], fn ({k, v}, acc) ->
+        acc ++ [{k, nilify_value(v)}]
+      end
     else
       Enum.filter(value, &nilify_value(&1))
     end
     |> Utils.presence
   end
   defp nilify_value(value) when is_map(value) do
-    value
-    |> Enum.filter(fn ({_, v}) -> nilify_value(v) end)
-    |> Enum.into(%{})
+    Enum.reduce value, %{}, fn ({k, v}, acc) ->
+      Map.put(acc, k, nilify_value(v))
+    end
     |> Utils.presence
   end
   defp nilify_value(value) do
@@ -86,20 +88,24 @@ defmodule Filterable.Params do
 
   defp default_value(value, default) when is_list(value) and is_list(default) do
     if Keyword.keyword?(value) && Keyword.keyword?(default) do
-      Keyword.merge(default, value)
+      Enum.reduce value, [], fn ({k, v}, acc) ->
+        acc ++ [{k, default_value(v, Keyword.get(default, k))}]
+      end
     else
       value
     end
   end
   defp default_value(value, default) when is_map(value) and is_list(default) do
     if Keyword.keyword?(default) do
-      default |> Enum.into(%{}) |> Map.merge(value)
+      default_value(value, Enum.into(default, %{}))
     else
       value
     end
   end
   defp default_value(value, default) when is_map(value) and is_map(default) do
-    Map.merge(default, value)
+    Enum.reduce value, %{}, fn ({k, v}, acc) ->
+      Map.put(acc, k, default_value(v, Utils.get_indifferent(default, k)))
+    end
   end
   defp default_value(value, default) when is_nil(value) do
     default
@@ -108,7 +114,10 @@ defmodule Filterable.Params do
     value
   end
 
-  defp cast_value(value, cast) when is_list(value) and not is_nil(cast) do
+  defp cast_value(value, cast) when is_nil(value) or is_nil(cast) do
+    value
+  end
+  defp cast_value(value, cast) when is_list(value) do
     if Keyword.keyword?(value) do
       Enum.reduce value, [], fn ({k, v}, acc) ->
         acc ++ [{k, cast_value(v, cast)}]
@@ -117,7 +126,7 @@ defmodule Filterable.Params do
       Enum.map(value, &cast_value(&1, cast))
     end
   end
-  defp cast_value(value, cast) when is_map(value) and not is_nil(cast) do
+  defp cast_value(value, cast) when is_map(value) do
     Enum.reduce value, %{}, fn ({k, v}, acc) ->
       Map.put(acc, k, cast_value(v, cast))
     end
@@ -127,6 +136,9 @@ defmodule Filterable.Params do
   end
   defp cast_value(value, cast) when is_function(cast) do
     cast.(value)
+  end
+  defp cast_value(value, cast) when is_atom(cast) do
+    apply(Filterable.Cast, cast, [value])
   end
   defp cast_value(value, _) do
     value

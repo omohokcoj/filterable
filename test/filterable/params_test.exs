@@ -57,10 +57,10 @@ defmodule Filterable.ParamsTest do
     assert value == nil
 
     value = filter_value(params, param: :skills, trim: true)
-    assert value == %{"vox" => 1}
+    assert value == %{"vox" => 1, "piano" => nil}
 
     value = filter_value(params, param: :keywords, trim: true)
-    assert value == [one: 1]
+    assert value == [one: 1, two: nil]
   end
 
   test "returns blank value", params do
@@ -88,10 +88,10 @@ defmodule Filterable.ParamsTest do
     assert value == %{"vox" => 1, "piano" => "test"}
 
     value = filter_value(params, param: :skills, trim: true, default: [piano: "test"])
-    assert value == %{"vox" => 1, piano: "test"}
+    assert value == %{"vox" => 1, "piano" => "test"}
 
     value = filter_value(params, param: :keywords, trim: true, default: [two: 2])
-    assert value == [two: 2, one: 1]
+    assert value == [one: 1, two: 2]
   end
 
   test "doesn't return default value when value present", params do
@@ -102,16 +102,16 @@ defmodule Filterable.ParamsTest do
     assert value == " "
 
     value = filter_value(params, param: :skills, trim: true, default: %{"vox" => "test"})
-    assert value == %{"vox" => 1}
+    assert value == %{"vox" => 1, "piano" => nil}
 
     value = filter_value(params, param: :skills, trim: true, default: ["test"])
-    assert value == %{"vox" => 1}
+    assert value == %{"vox" => 1, "piano" => nil}
 
     value = filter_value(params, param: :keywords, trim: true, default: [one: "not one"])
-    assert value == [one: 1]
+    assert value == [one: 1, two: nil]
 
     value = filter_value(params, param: :keywords, trim: true, default: ["not one"])
-    assert value == [one: 1]
+    assert value == [one: 1, two: nil]
   end
 
   test "returns casted value", params do
@@ -122,9 +122,12 @@ defmodule Filterable.ParamsTest do
     assert value == :tom
 
     value = filter_value(params, param: :skills, trim: true, cast: &Integer.to_string/1)
-    assert value == %{"vox" => "1"}
+    assert value == %{"vox" => "1", "piano" => nil}
 
     value = filter_value(params, param: :keywords, trim: true, cast: &Integer.to_string/1)
-    assert value == [one: "1"]
+    assert value == [one: "1", two: nil]
+
+    value = filter_value(params, param: :keywords, trim: true, cast: :integer)
+    assert value == [one: 1, two: nil]
   end
 end
