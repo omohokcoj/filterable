@@ -11,6 +11,7 @@ defmodule Filterable.Mixfile do
      description: description(),
      source_url: @project_url,
      homepage_url: @project_url,
+     elixirc_paths: elixirc_paths(Mix.env),
      package: package(),
      deps: deps(),
      build_embedded: Mix.env == :prod,
@@ -46,6 +47,10 @@ defmodule Filterable.Mixfile do
      links: %{"GitHub" => "https://github.com/omohokcoj/filterable",
               "Docs" => "https://hexdocs.pm/filterable"}]
   end
+
+  defp elixirc_paths(:test), do: elixirc_paths() ++ ~w(test/support)
+  defp elixirc_paths(_), do: elixirc_paths()
+  defp elixirc_paths(), do: ~w(lib)
 
   defp docs do
     {ref, 0} = System.cmd("git", ["rev-parse", "--verify", "--quiet", "HEAD"])

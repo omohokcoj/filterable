@@ -3,9 +3,18 @@ defmodule Filterable.ParamsTest do
   import Filterable.Params
 
   setup_all do
-    {:ok, %{name: "Tom", bio: "  was born", age: 23, friends: ["Jonny "],
-            enemies: [], skills: %{"vox" => 1, "piano" => " "}, address: " ",
-            keywords: [one: 1, two: ["  "]]}}
+    {:ok,
+      %{
+        name: "Tom",
+        bio: "  was born",
+        age: 23,
+        friends: ["Jonny "],
+        enemies: [],
+        skills: %{"vox" => 1, "piano" => " "},
+        address: " ",
+        keywords: [one: 1, two: ["  "]]
+      }
+    }
   end
 
   test "returns filter value", params do
@@ -127,7 +136,13 @@ defmodule Filterable.ParamsTest do
     value = filter_value(params, param: :keywords, trim: true, cast: &Integer.to_string/1)
     assert value == [one: "1", two: nil]
 
-    value = filter_value(params, param: :keywords, trim: true, cast: :integer)
+    value = filter_value(params, param: :keywords, trim: true, cast: :string)
+    assert value == [one: "1", two: nil]
+
+    value = filter_value(params, param: :keywords, trim: true, cast: %{})
     assert value == [one: 1, two: nil]
+
+    value = filter_value(params, param: :friends, trim: true, cast: :integer)
+    assert value == [nil]
   end
 end
