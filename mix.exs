@@ -2,7 +2,7 @@ defmodule Filterable.Mixfile do
   use Mix.Project
 
   @project_url "https://github.com/omohokcoj/filterable"
-  @version "0.1.3"
+  @version "0.1.4"
 
   def project do
     [app: :filterable,
@@ -19,8 +19,8 @@ defmodule Filterable.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: ExCoveralls],
-     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test, "coveralls.travis": :test, "coveralls.html": :test]
-   ]
+     preferred_cli_env: ["coveralls": :test, "coveralls.detail": :test,
+                         "coveralls.travis": :test, "coveralls.html": :test]]
   end
 
   def application do

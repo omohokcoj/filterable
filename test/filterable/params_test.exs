@@ -1,148 +1,180 @@
 defmodule Filterable.ParamsTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
   import Filterable.Params
 
-  setup_all do
-    {:ok,
-      %{
-        name: "Tom",
-        bio: "  was born",
-        age: 23,
-        friends: ["Jonny "],
-        enemies: [],
-        skills: %{"vox" => 1, "piano" => " "},
-        address: " ",
-        keywords: [one: 1, two: ["  "]]
-      }
-    }
+  @params %{name: "Tom",
+            bio: "  was born",
+            age: 23,
+            friends: ["Jonny "],
+            enemies: [],
+            skills: %{"vox" => 1, "piano" => " "},
+            address: " ",
+            keywords: [one: 1, two: ["  "]]}
+
+  describe "fetch param" do
+    test "with atom key" do
+      value = filter_value(@params, param: :name)
+      assert value == "Tom"
+    end
+
+    test "with string key" do
+      value = filter_value(%{"cool" => true}, param: :cool)
+      assert value == true
+    end
   end
 
-  test "returns filter value", params do
-    value = filter_value(params, param: :name)
-    assert value == "Tom"
+  describe "fetch multimple params" do
+    test "with atom key" do
+      value = filter_value(@params, param: [:name, :age])
+      assert value == %{age: 23, name: "Tom"}
+    end
 
-    value = filter_value(%{"cool" => true}, param: :cool)
-    assert value == true
-
-    value = filter_value(params, param: :friends)
-    assert value == ["Jonny "]
+    test "with string key" do
+      value = filter_value(%{"test" => true}, param: [:test, :bio])
+      assert value == %{test: true, bio: nil}
+    end
   end
 
-  test "returns map of filter values", params do
-    value = filter_value(params, param: [:name, :age])
-    assert value == %{age: 23, name: "Tom"}
+  describe "fetch nested params" do
+    test "with atom key" do
+      value = filter_value(@params, params: :skills, param: :vox)
+      assert value == 1
+    end
 
-    value = filter_value(params, param: [:name, :bio])
-    assert value == %{bio: "  was born", name: "Tom"}
+    test "with string key" do
+      value = filter_value(@params, params: "skills", param: :vox)
+      assert value == 1
+    end
   end
 
-  test "returns filter value with indifferent access", params do
-    value = filter_value(params, param: "name")
-    assert value == "Tom"
+  describe "trim params" do
+    test "not nested string param" do
+      value = filter_value(@params, param: :bio, trim: true)
+      assert value == "was born"
+    end
+
+    test "string nested in map" do
+      value = filter_value(@params, param: [:name, :bio], trim: true)
+      assert value == %{bio: "was born", name: "Tom"}
+    end
+
+    test "string inside list nested in map" do
+      value = filter_value(@params, param: [:name, :friends], trim: true)
+      assert value == %{name: "Tom", friends: ["Jonny"]}
+    end
   end
 
-  test "returns trimed value", params do
-    value = filter_value(params, param: :bio, trim: true)
-    assert value == "was born"
+  describe "nilify params" do
+    test "empty list" do
+      value = filter_value(@params, param: :enemies)
+      assert value == nil
+    end
 
-    value = filter_value(params, param: :skills, trim: true, allow_blank: true)
-    assert value == %{"vox" => 1, "piano" => ""}
+    test "empty string" do
+      value = filter_value(@params, param: :address, trim: true)
+      assert value == nil
+    end
 
-    value = filter_value(params, param: [:name, :bio], trim: true)
-    assert value == %{bio: "was born", name: "Tom"}
+    test "nested blank values" do
+      value = filter_value(@params, param: :skills, trim: true)
+      assert value == %{"vox" => 1, "piano" => nil}
 
-    value = filter_value(params, param: [:name, :friends], trim: true)
-    assert value == %{name: "Tom", friends: ["Jonny"]}
-
-    value = filter_value(params, param: :keywords, trim: true, allow_blank: true)
-    assert value == [one: 1, two: [""]]
+      value = filter_value(@params, param: :keywords, trim: true)
+      assert value == [one: 1, two: nil]
+    end
   end
 
-  test "returns nilifed value", params do
-    value = filter_value(params, param: :enemies)
-    assert value == nil
+  describe "allow blank params" do
+    test "empty list" do
+      value = filter_value(@params, param: :enemies, allow_blank: true)
+      assert value == []
+    end
 
-    value = filter_value(params, param: :address, trim: true)
-    assert value == nil
+    test "empty string" do
+      value = filter_value(@params, param: :address, allow_blank: true, trim: true)
+      assert value == ""
+    end
 
-    value = filter_value(params, param: :skills, trim: true)
-    assert value == %{"vox" => 1, "piano" => nil}
+    test "nested blank values" do
+      value = filter_value(@params, param: :skills, trim: true, allow_blank: true)
+      assert value == %{"vox" => 1, "piano" => ""}
 
-    value = filter_value(params, param: :keywords, trim: true)
-    assert value == [one: 1, two: nil]
+      value = filter_value(@params, param: :keywords, trim: true, allow_blank: true)
+      assert value == [one: 1, two: [""]]
+    end
   end
 
-  test "returns blank value", params do
-    value = filter_value(params, param: :enemies, allow_blank: true)
-    assert value == []
+  describe "replace with default value" do
+    test "string value" do
+      value = filter_value(@params, param: :address, default: "cool", trim: true)
+      assert value == "cool"
+    end
 
-    value = filter_value(params, param: :address, allow_blank: true, trim: true)
-    assert value == ""
+    test "nil value inside map" do
+      value = filter_value(@params, param: :skills, trim: true, default: %{"piano" => "test"})
+      assert value == %{"vox" => 1, "piano" => "test"}
 
-    value = filter_value(params, param: :skills, trim: true, allow_blank: true)
-    assert value == %{"vox" => 1, "piano" => ""}
+      value = filter_value(@params, param: :skills, trim: true, default: [piano: "test"])
+      assert value == %{"vox" => 1, "piano" => "test"}
+    end
 
-    value = filter_value(params, param: :keywords, trim: true, allow_blank: true)
-    assert value == [one: 1, two: [""]]
+    test "nil value inside keyword list" do
+      value = filter_value(@params, param: :keywords, trim: true, default: [two: 2])
+      assert value == [one: 1, two: 2]
+    end
   end
 
-  test "returns default value", params do
-    value = filter_value(params, param: :enemies, default: "cool")
-    assert value == "cool"
+  describe "doesn't replace with default value" do
+    test "value not nil" do
+      value = filter_value(@params, param: :name, default: "cool")
+      assert value == "Tom"
+    end
 
-    value = filter_value(params, param: :address, default: "cool", trim: true)
-    assert value == "cool"
+    test "nested value not nil" do
+      value = filter_value(@params, param: :skills, trim: true, default: %{"vox" => "test"})
+      assert value == %{"vox" => 1, "piano" => nil}
 
-    value = filter_value(params, param: :skills, trim: true, default: %{"piano" => "test"})
-    assert value == %{"vox" => 1, "piano" => "test"}
+      value = filter_value(@params, param: :keywords, trim: true, default: [one: "not one"])
+      assert value == [one: 1, two: nil]
+    end
 
-    value = filter_value(params, param: :skills, trim: true, default: [piano: "test"])
-    assert value == %{"vox" => 1, "piano" => "test"}
+    test "default value not set" do
+      value = filter_value(@params, param: :keywords, trim: true, default: ["not one"])
+      assert value == [one: 1, two: nil]
 
-    value = filter_value(params, param: :keywords, trim: true, default: [two: 2])
-    assert value == [one: 1, two: 2]
+      value = filter_value(@params, param: :skills, trim: true, default: ["not one"])
+      assert value == %{"vox" => 1, "piano" => nil}
+    end
   end
 
-  test "doesn't return default value when value present", params do
-    value = filter_value(params, param: :name, default: "cool")
-    assert value == "Tom"
+  describe "cast param" do
+    test "with function" do
+      value = filter_value(@params, param: :name, cast: &String.downcase/1)
+      assert value == "tom"
 
-    value = filter_value(params, param: :address, default: "cool", trim: false)
-    assert value == " "
+      value = filter_value(@params, param: :skills, trim: true, cast: &Integer.to_string/1)
+      assert value == %{"vox" => "1", "piano" => nil}
 
-    value = filter_value(params, param: :skills, trim: true, default: %{"vox" => "test"})
-    assert value == %{"vox" => 1, "piano" => nil}
+      value = filter_value(@params, param: :keywords, trim: true, cast: &Integer.to_string/1)
+      assert value == [one: "1", two: nil]
+    end
 
-    value = filter_value(params, param: :skills, trim: true, default: ["test"])
-    assert value == %{"vox" => 1, "piano" => nil}
+    test "with list of functions" do
+      value = filter_value(@params, param: :name, cast: [&String.downcase/1, &String.to_atom/1])
+      assert value == :tom
+    end
 
-    value = filter_value(params, param: :keywords, trim: true, default: [one: "not one"])
-    assert value == [one: 1, two: nil]
+    test "with atom" do
+      value = filter_value(@params, param: :keywords, trim: true, cast: :string)
+      assert value == [one: "1", two: nil]
 
-    value = filter_value(params, param: :keywords, trim: true, default: ["not one"])
-    assert value == [one: 1, two: nil]
-  end
+      value = filter_value(@params, param: :friends, trim: true, cast: :integer)
+      assert value == [nil]
+    end
 
-  test "returns casted value", params do
-    value = filter_value(params, param: :name, cast: &String.downcase/1)
-    assert value == "tom"
-
-    value = filter_value(params, param: :name, cast: [&String.downcase/1, &String.to_atom/1])
-    assert value == :tom
-
-    value = filter_value(params, param: :skills, trim: true, cast: &Integer.to_string/1)
-    assert value == %{"vox" => "1", "piano" => nil}
-
-    value = filter_value(params, param: :keywords, trim: true, cast: &Integer.to_string/1)
-    assert value == [one: "1", two: nil]
-
-    value = filter_value(params, param: :keywords, trim: true, cast: :string)
-    assert value == [one: "1", two: nil]
-
-    value = filter_value(params, param: :keywords, trim: true, cast: %{})
-    assert value == [one: 1, two: nil]
-
-    value = filter_value(params, param: :friends, trim: true, cast: :integer)
-    assert value == [nil]
+    test "with wrong cast param" do
+      value = filter_value(@params, param: :keywords, trim: true, cast: %{})
+      assert value == [one: 1, two: nil]
+    end
   end
 end
