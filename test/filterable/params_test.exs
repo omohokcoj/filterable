@@ -151,12 +151,6 @@ defmodule Filterable.ParamsTest do
     test "with function" do
       value = filter_value(@params, param: :name, cast: &String.downcase/1)
       assert value == "tom"
-
-      value = filter_value(@params, param: :skills, trim: true, cast: &Integer.to_string/1)
-      assert value == %{"vox" => "1", "piano" => nil}
-
-      value = filter_value(@params, param: :keywords, trim: true, cast: &Integer.to_string/1)
-      assert value == [one: "1", two: nil]
     end
 
     test "with list of functions" do
@@ -168,8 +162,8 @@ defmodule Filterable.ParamsTest do
       value = filter_value(@params, param: :keywords, trim: true, cast: :string)
       assert value == [one: "1", two: nil]
 
-      value = filter_value(@params, param: :friends, trim: true, cast: :integer)
-      assert value == [nil]
+      value = filter_value(@params, param: :friends, trim: true, cast: :integer, allow_blank: true)
+      assert value == []
     end
 
     test "with wrong cast param" do

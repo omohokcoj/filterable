@@ -1,11 +1,13 @@
 defmodule Filterable.Mixfile do
   use Mix.Project
 
+  @name "Filterable"
   @project_url "https://github.com/omohokcoj/filterable"
   @version "0.1.4"
 
   def project do
     [app: :filterable,
+     name: @name,
      version: @version,
      elixir: "~> 1.3",
      source_url: @project_url,
@@ -57,8 +59,9 @@ defmodule Filterable.Mixfile do
   defp elixirc_paths(), do: ~w(lib)
 
   defp docs do
-    [source_ref: System.cmd("git", ["rev-parse", "--verify", "--quiet", "HEAD"]),
-     main: "readme",
+    [main: @name,
+     source_ref: "v#{@version}",
+     source_url: @project_url,
      extras: ["README.md"]]
   end
 

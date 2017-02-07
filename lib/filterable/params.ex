@@ -10,8 +10,8 @@ defmodule Filterable.Params do
     |> fetch_params(params_key)
     |> fetch_value(param_key)
     |> trim_value(trim_opt)
-    |> nilify_value(allow_blank_opt)
     |> cast_value(cast_opt)
+    |> nilify_value(allow_blank_opt)
     |> default_value(default_opt)
   end
 
@@ -25,7 +25,7 @@ defmodule Filterable.Params do
 
   defp fetch_value(params, key) when is_list(key) do
     Enum.reduce key, %{}, fn (k, acc) ->
-      Map.put(acc, k, Utils.get_indifferent(params, k))
+      Map.put(acc, k, fetch_value(params, k))
     end
   end
   defp fetch_value(params, key) do
@@ -114,16 +114,13 @@ defmodule Filterable.Params do
     value
   end
 
-  defp cast_value(value, cast) when is_nil(value) or is_nil(cast) do
-    value
-  end
   defp cast_value(value, cast) when is_list(value) do
     if Keyword.keyword?(value) do
       Enum.reduce value, [], fn ({k, v}, acc) ->
         acc ++ [{k, cast_value(v, cast)}]
       end
     else
-      Enum.map(value, &cast_value(&1, cast))
+      value |> Enum.map(&cast_value(&1, cast)) |> Enum.reject(&is_nil/1)
     end
   end
   defp cast_value(value, cast) when is_map(value) do
@@ -137,7 +134,7 @@ defmodule Filterable.Params do
   defp cast_value(value, cast) when is_function(cast) do
     cast.(value)
   end
-  defp cast_value(value, cast) when is_atom(cast) do
+  defp cast_value(value, cast) when is_atom(cast) and not is_nil(cast) do
     apply(Filterable.Cast, cast, [value])
   end
   defp cast_value(value, _) do
