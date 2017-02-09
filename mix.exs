@@ -26,7 +26,7 @@ defmodule Filterable.Mixfile do
   end
 
   def application do
-    [extra_applications: [:logger]]
+    [applications: applications(Mix.env)]
   end
 
   defp deps do
@@ -40,7 +40,7 @@ defmodule Filterable.Mixfile do
 
   defp description do
     """
-    Filterable allows to map incoming parameters to filter functions.
+    Allows to build filters in Elixir with easy to use DSL inspired by Rails has_scope.
     """
   end
 
@@ -53,6 +53,10 @@ defmodule Filterable.Mixfile do
      links: %{"GitHub" => "https://github.com/omohokcoj/filterable",
               "Docs" => "https://hexdocs.pm/filterable"}]
   end
+
+  defp applications(:test), do: applications() ++ ~w(postgrex ecto plug)a
+  defp applications(_), do: applications()
+  defp applications(), do: ~w(logger)a
 
   defp elixirc_paths(:test), do: elixirc_paths() ++ ~w(test/support)
   defp elixirc_paths(_), do: elixirc_paths()
