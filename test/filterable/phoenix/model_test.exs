@@ -26,6 +26,6 @@ defmodule Filterable.Phoenix.ModelTest do
   test "returns filter values" do
     params = Plug.Conn.Query.decode("name=Tom&age=21&about=''&another='test'")
     result = User.filter_values(%Plug.Conn{params: params})
-    assert result == [name: "Tom", age: 21, paginate: %{page: 1, per_page: 4}]
+    assert result == %{name: "Tom", age: 21, paginate: %{page: 1, per_page: 4}}
   end
 end

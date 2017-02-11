@@ -70,19 +70,19 @@ defmodule FilterableTest do
   end
 
   describe "paginate" do
-    test "with defaults" do
+    test "returns result using default params" do
       result = User |> apply_filters(%{}) |> Repo.all
       assert List.first(result).id == 1
       assert List.last(result).id == 4
     end
 
-    test "with single record per page" do
+    test "returns single record per page" do
       result = User |> apply_filters(per_page: 1) |> Repo.all
       assert List.first(result).id == 1
       assert List.last(result).id == 1
     end
 
-    test "with second page" do
+    test "returns second page" do
       result = User |> apply_filters(page: 2) |> Repo.all
       assert List.first(result).id == 5
       assert List.last(result).id == 8

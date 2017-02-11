@@ -1,5 +1,5 @@
 defmodule Filterable.CastTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   alias Filterable.Cast
 
   describe "integer/1" do

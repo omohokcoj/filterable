@@ -1,5 +1,5 @@
 defmodule Filterable.UtilsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   alias Filterable.Utils
 

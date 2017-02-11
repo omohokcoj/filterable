@@ -1,5 +1,5 @@
 defmodule Filterable.ParamsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   import Filterable.Params
 
   @params %{
@@ -118,6 +118,11 @@ defmodule Filterable.ParamsTest do
       assert value == "cool"
     end
 
+    test "struct value" do
+      value = filter_value(@params, param: :address, default: ~D[2017-01-01], trim: true)
+      assert value == ~D[2017-01-01]
+    end
+
     test "nil value inside map" do
       value = filter_value(@params, param: :skills, trim: true, default: [piano: "test"])
       assert value == %{vox: 1, piano: "test"}
@@ -153,17 +158,17 @@ defmodule Filterable.ParamsTest do
   end
 
   describe "cast param" do
-    test "with function" do
+    test "using function" do
       value = filter_value(@params, param: :name, cast: &String.downcase/1)
       assert value == "tom"
     end
 
-    test "with list of functions" do
+    test "using list of functions" do
       value = filter_value(@params, param: :name, cast: [&String.downcase/1, &String.to_atom/1])
       assert value == :tom
     end
 
-    test "with atom" do
+    test "using atom param" do
       value = filter_value(@params, param: :keywords, trim: true, cast: :string)
       assert value == %{one: "1", two: nil}
 
@@ -171,20 +176,20 @@ defmodule Filterable.ParamsTest do
       assert value == []
     end
 
-    test "with struct value" do
+    test "using wrong cast param" do
+      value = filter_value(@params, param: :keywords, trim: true, cast: %{})
+      assert value == %{one: 1, two: nil}
+    end
+
+    test "returns casted struct value" do
       value = filter_value(@params, param: :birthday, cast: :string)
       assert value == "2017-01-01"
     end
 
-    test "raises with bang cast function" do
+    test "raises error using bang cast function" do
       assert_raise Filterable.CastError, "Unable to cast 1 to date", fn ->
         filter_value(@params, param: :keywords, trim: true, cast: :date!)
       end
-    end
-
-    test "with wrong cast param" do
-      value = filter_value(@params, param: :keywords, trim: true, cast: %{})
-      assert value == %{one: 1, two: nil}
     end
   end
 end

@@ -41,9 +41,10 @@ defmodule Filterable do
     |> Enum.reduce(queryable, fn ({filter_name, filter_opts}, queryable) ->
       options = Keyword.merge(opts, filter_opts)
 
-      value     = Keyword.get(values, filter_name)
       share     = Keyword.get(options, :share)
       allow_nil = Keyword.get(options, :allow_nil)
+
+      value = Map.get(values, filter_name)
 
       try do
         cond do
@@ -61,7 +62,7 @@ defmodule Filterable do
 
   def filter_values(params, module, opts \\ []) do
     module.defined_filters
-    |> Enum.reduce([], fn ({filter_name, filter_opts}, list) ->
+    |> Enum.reduce(%{}, fn ({filter_name, filter_opts}, acc) ->
       options =
         [param: filter_name]
         |> Keyword.merge(@default_options)
@@ -69,8 +70,8 @@ defmodule Filterable do
         |> Keyword.merge(opts)
 
       case Params.filter_value(params, options) do
-        nil -> list
-        val -> list ++ [{filter_name, val}]
+        nil -> acc
+        val -> Map.put(acc, filter_name, val)
       end
     end)
   end

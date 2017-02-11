@@ -1,8 +1,12 @@
-# Filterable [![Build Status](https://travis-ci.org/omohokcoj/filterable.svg?branch=master)](https://travis-ci.org/omohokcoj/filterable) [![Code Climate](https://codeclimate.com/github/omohokcoj/filterable/badges/gpa.svg)](https://codeclimate.com/github/omohokcoj/filterable) [![Coverage Status](https://coveralls.io/repos/github/omohokcoj/filterable/badge.svg?branch=master)](https://coveralls.io/github/omohokcoj/filterable?branch=master)
+# Filterable
+
+[![Build Status](https://travis-ci.org/omohokcoj/filterable.svg?branch=master)](https://travis-ci.org/omohokcoj/filterable)
+[![Code Climate](https://codeclimate.com/github/omohokcoj/filterable/badges/gpa.svg)](https://codeclimate.com/github/omohokcoj/filterable)
+[![Coverage Status](https://coveralls.io/repos/github/omohokcoj/filterable/badge.svg?branch=master)](https://coveralls.io/github/omohokcoj/filterable?branch=master)
 
 Filterable allows to map incoming parameters to filter functions.
 The goal is to provide minimal and easy to use DSL for building filters using pure Elixir.
-Filterable doesn't depend on external libraries or frameworks and can be used both with Phoenix and pure Elixir projects.
+Filterable doesn't depend on external libraries or frameworks and can be used both in Phoenix and pure Elixir projects.
 Inspired by [has_scope](https://github.com/plataformatec/has_scope).
 
 ## Installation

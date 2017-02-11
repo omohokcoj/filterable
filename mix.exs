@@ -50,7 +50,7 @@ defmodule Filterable.Mixfile do
      contributors: ["Pete Matsyburka"],
      maintainers: ["Pete Matsyburka"],
      licenses: ["MIT"],
-     links: %{"GitHub" => "https://github.com/omohokcoj/filterable",
+     links: %{"GitHub" => @project_url,
               "Docs" => "https://hexdocs.pm/filterable"}]
   end
 
