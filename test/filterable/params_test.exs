@@ -40,12 +40,12 @@ defmodule Filterable.ParamsTest do
 
   describe "fetch nested params" do
     test "with atom key" do
-      value = filter_value(@params, params: :skills, param: :vox)
+      value = filter_value(@params, top_param: :skills, param: :vox)
       assert value == 1
     end
 
     test "with string key" do
-      value = filter_value(@params, params: "skills", param: :vox)
+      value = filter_value(@params, top_param: "skills", param: :vox)
       assert value == 1
     end
   end
@@ -119,9 +119,6 @@ defmodule Filterable.ParamsTest do
     end
 
     test "nil value inside map" do
-      value = filter_value(@params, param: :skills, trim: true, default: %{"piano" => "test"})
-      assert value == %{vox: 1, piano: "test"}
-
       value = filter_value(@params, param: :skills, trim: true, default: [piano: "test"])
       assert value == %{vox: 1, piano: "test"}
     end
@@ -139,7 +136,7 @@ defmodule Filterable.ParamsTest do
     end
 
     test "nested value not nil" do
-      value = filter_value(@params, param: :skills, trim: true, default: %{"vox" => "test"})
+      value = filter_value(@params, param: :skills, trim: true, default: [vox: "test"])
       assert value == %{vox: 1, piano: nil}
 
       value = filter_value(@params, param: :keywords, trim: true, default: [one: "not one"])

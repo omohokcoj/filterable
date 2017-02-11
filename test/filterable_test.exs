@@ -39,6 +39,36 @@ defmodule FilterableTest do
     end
   end
 
+  describe "sort" do
+    test "returns users sorted by name asc" do
+      result = User |> apply_filters(sort: %{field: "name", order: "asc"}) |> Repo.all
+
+      assert length(result) == 4
+      assert List.first(result).id == 8
+      assert List.first(result).name == "Barry"
+    end
+
+    test "returns users sorted by surname" do
+      result = User |> apply_filters(sort: %{field: "surname"}) |> Repo.all
+
+      assert length(result) == 4
+      assert List.first(result).id == 6
+      assert List.first(result).surname == "Valentine"
+    end
+
+    test "raises error if sort direction invalid" do
+      assert_raise Filterable.InvalidParamError, "Unable to sort using :test, only 'asc' and 'desc' allowed", fn ->
+        apply_filters(User, sort: %{field: :name, order: :test})
+      end
+    end
+
+    test "raises error if sort field invalid" do
+      assert_raise Filterable.InvalidParamError, "Unable to sort on :test, only name and surname allowed", fn ->
+        apply_filters(User, sort: %{field: :test, order: :desc})
+      end
+    end
+  end
+
   describe "paginate" do
     test "with defaults" do
       result = User |> apply_filters(%{}) |> Repo.all
