@@ -13,16 +13,21 @@ defmodule Filterable.Params do
     |> cast_value(cast_opt)
     |> nilify_value(allow_blank_opt)
     |> default_value(default_opt)
+    |> Utils.to_atoms_map
   end
 
   defp fetch_options(opts) do
     Enum.map(@available_options, &Keyword.get(opts, &1))
   end
 
+  defp fetch_params(params, nil) do
+    params
+  end
   defp fetch_params(params, key) do
-    Utils.get_indifferent(params, key, params)
+    Utils.get_indifferent(params, key)
   end
 
+  defp fetch_value(nil, _), do: nil
   defp fetch_value(params, key) when is_list(key) do
     Enum.reduce key, %{}, fn (k, acc) ->
       Map.put(acc, k, fetch_value(params, k))
@@ -36,6 +41,9 @@ defmodule Filterable.Params do
     trim_value(value)
   end
   defp trim_value(value, _) do
+    value
+  end
+  defp trim_value(%{__struct__: _} = value) do
     value
   end
   defp trim_value(value) when is_bitstring(value) do
@@ -63,6 +71,9 @@ defmodule Filterable.Params do
   defp nilify_value(value, _) do
     value
   end
+  defp nilify_value(%{__struct__: _} = value) do
+    value
+  end
   defp nilify_value(value) when is_bitstring(value) do
     Utils.presence(value)
   end
@@ -73,19 +84,20 @@ defmodule Filterable.Params do
       end
     else
       Enum.filter(value, &nilify_value(&1))
-    end
-    |> Utils.presence
+    end |> Utils.presence
   end
   defp nilify_value(value) when is_map(value) do
     Enum.reduce value, %{}, fn ({k, v}, acc) ->
       Map.put(acc, k, nilify_value(v))
-    end
-    |> Utils.presence
+    end |> Utils.presence
   end
   defp nilify_value(value) do
     value
   end
 
+  defp default_value(%{__struct__: _} = value, _) do
+    value
+  end
   defp default_value(value, default) when is_list(value) and is_list(default) do
     if Keyword.keyword?(value) && Keyword.keyword?(default) do
       Enum.reduce value, [], fn ({k, v}, acc) ->
@@ -114,6 +126,18 @@ defmodule Filterable.Params do
     value
   end
 
+
+  defp cast_value(value, nil) do
+    value
+  end
+  defp cast_value(%{__struct__: _} = value, cast) do
+    apply(Filterable.Cast, cast, [value])
+  end
+  defp cast_value(value, cast) when is_map(value) do
+    Enum.reduce value, %{}, fn ({k, v}, acc) ->
+      Map.put(acc, k, cast_value(v, cast))
+    end
+  end
   defp cast_value(value, cast) when is_list(value) do
     if Keyword.keyword?(value) do
       Enum.reduce value, [], fn ({k, v}, acc) ->
@@ -123,18 +147,13 @@ defmodule Filterable.Params do
       value |> Enum.map(&cast_value(&1, cast)) |> Enum.reject(&is_nil/1)
     end
   end
-  defp cast_value(value, cast) when is_map(value) do
-    Enum.reduce value, %{}, fn ({k, v}, acc) ->
-      Map.put(acc, k, cast_value(v, cast))
-    end
-  end
   defp cast_value(value, cast) when is_list(cast) do
     Enum.reduce(cast, value, &(&1.(&2)))
   end
   defp cast_value(value, cast) when is_function(cast) do
     cast.(value)
   end
-  defp cast_value(value, cast) when is_atom(cast) and not is_nil(cast) do
+  defp cast_value(value, cast) when is_atom(cast) do
     apply(Filterable.Cast, cast, [value])
   end
   defp cast_value(value, _) do

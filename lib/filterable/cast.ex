@@ -1,9 +1,21 @@
 defmodule Filterable.Cast do
+  @cast_types ~w(integer float string atom date datetime)a
+
+  # Define functions that raises error.
+  for type <- @cast_types do
+    def unquote(String.to_atom(Atom.to_string(type) <> "!"))(value) do
+      cast!(unquote(type), value)
+    end
+  end
+
   def integer(value) when is_bitstring(value) do
     case Integer.parse(value) do
       :error -> nil
       {int, _} -> int
     end
+  end
+  def integer(value) when is_float(value) do
+    round(value)
   end
   def integer(value) when is_integer(value) do
     value
@@ -12,20 +24,27 @@ defmodule Filterable.Cast do
     nil
   end
 
-  def string(value) when is_integer(value) do
-    Integer.to_string(value)
+  def float(value) when is_bitstring(value) do
+    case Float.parse(value) do
+      :error -> nil
+      {int, _} -> int
+    end
   end
-  def string(value) when is_float(value) do
-    Float.to_string(value)
+  def float(value) when is_integer(value) do
+    value / 1
   end
-  def string(value) when is_atom(value) do
-    Atom.to_string(value)
+  def float(value) when is_float(value) do
+    value
   end
+  def float(_) do
+    nil
+  end
+
   def string(value) when is_bitstring(value) do
     value
   end
-  def string(_) do
-    nil
+  def string(value) do
+    Kernel.to_string(value)
   end
 
   def atom(value) when is_bitstring(value) do
@@ -35,30 +54,6 @@ defmodule Filterable.Cast do
     value
   end
   def atom(_) do
-    nil
-  end
-
-  def keyword(value) when is_map(value) do
-    Map.to_list(value)
-  end
-  def keyword(value) when is_list(value) do
-    if Keyword.keyword?(value) do
-      value
-    end
-  end
-  def keyword(_) do
-    nil
-  end
-
-  def map(value) when is_list(value) do
-    if Keyword.keyword?(value) do
-      Enum.into(value, %{})
-    end
-  end
-  def map(value) when is_map(value) do
-    value
-  end
-  def map(_) do
     nil
   end
 
@@ -76,15 +71,23 @@ defmodule Filterable.Cast do
   end
 
   def datetime(value) when is_bitstring(value) do
-    case DateTime.from_iso8601(value) do
+    case NaiveDateTime.from_iso8601(value) do
       {:ok, val} -> val
       {:error, _} -> nil
     end
   end
-  def datetime(%DateTime{} = value) do
+  def datetime(%NaiveDateTime{} = value) do
     value
   end
   def datetime(_) do
     nil
+  end
+
+  defp cast!(_, nil), do: nil
+  defp cast!(type, value) do
+    case apply(__MODULE__, type, [value]) do
+      nil -> raise Filterable.CastError, type: type, value: value
+      val -> val
+    end
   end
 end

@@ -1,4 +1,4 @@
-id,gender,given_name,surname,street_address,city,state,zip_code,country,phone,birthday,weight,age,latlng,inserted_at,updated_at
+id,gender,name,surname,street_address,city,state,zip_code,country,phone,birthday,weight,age,latlng,inserted_at,updated_at
 1,male,Martin,Mejia,3224 Selah Way,Brattleboro,VT,5301,US,802-713-0025,1968-03-28,89.9,22,"{42.823378,-72.689639}",2017-01-26 21:03:31.211255,2017-01-26 21:03:31.211262
 2,female,Debbie,Judson,3107 Columbia Mine Road,Huntington,WV,25701,US,304-521-7011,1974-06-15,90.5,25,"{38.464308,-82.454761}",2017-01-26 21:03:31.238843,2017-01-26 21:03:31.238849
 3,female,Margie,Chaney,684 Gateway Avenue,Bakersfield,CA,93301,US,661-868-6211,1989-06-04,87.9,40,"{35.358853,-118.989485}",2017-01-26 21:03:31.242626,2017-01-26 21:03:31.242632

@@ -3,7 +3,7 @@ defmodule Filterable.User do
 
   use Filterable.Phoenix.Model
 
-  filterable Filterable.UserModelFilters
+  filterable Filterable.UserFilters
 
   schema "users" do
     field :gender,         :string

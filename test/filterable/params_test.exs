@@ -2,14 +2,17 @@ defmodule Filterable.ParamsTest do
   use ExUnit.Case, async: true
   import Filterable.Params
 
-  @params %{name: "Tom",
-            bio: "  was born",
-            age: 23,
-            friends: ["Jonny "],
-            enemies: [],
-            skills: %{"vox" => 1, "piano" => " "},
-            address: " ",
-            keywords: [one: 1, two: ["  "]]}
+  @params %{
+    name: "Tom",
+    bio: "  was born",
+    age: 23,
+    friends: ["Jonny "],
+    enemies: [],
+    skills: %{"vox" => 1, "piano" => " "},
+    address: " ",
+    keywords: [one: 1, two: ["  "]],
+    birthday: ~D[2017-01-01]
+  }
 
   describe "fetch param" do
     test "with atom key" do
@@ -58,6 +61,11 @@ defmodule Filterable.ParamsTest do
       assert value == %{bio: "was born", name: "Tom"}
     end
 
+    test "return struct" do
+      value = filter_value(@params, param: :birthday, trim: true)
+      assert value == ~D[2017-01-01]
+    end
+
     test "string inside list nested in map" do
       value = filter_value(@params, param: [:name, :friends], trim: true)
       assert value == %{name: "Tom", friends: ["Jonny"]}
@@ -77,10 +85,10 @@ defmodule Filterable.ParamsTest do
 
     test "nested blank values" do
       value = filter_value(@params, param: :skills, trim: true)
-      assert value == %{"vox" => 1, "piano" => nil}
+      assert value == %{vox: 1, piano: nil}
 
       value = filter_value(@params, param: :keywords, trim: true)
-      assert value == [one: 1, two: nil]
+      assert value == %{one: 1, two: nil}
     end
   end
 
@@ -97,10 +105,10 @@ defmodule Filterable.ParamsTest do
 
     test "nested blank values" do
       value = filter_value(@params, param: :skills, trim: true, allow_blank: true)
-      assert value == %{"vox" => 1, "piano" => ""}
+      assert value == %{vox: 1, piano: ""}
 
       value = filter_value(@params, param: :keywords, trim: true, allow_blank: true)
-      assert value == [one: 1, two: [""]]
+      assert value == %{one: 1, two: [""]}
     end
   end
 
@@ -112,15 +120,15 @@ defmodule Filterable.ParamsTest do
 
     test "nil value inside map" do
       value = filter_value(@params, param: :skills, trim: true, default: %{"piano" => "test"})
-      assert value == %{"vox" => 1, "piano" => "test"}
+      assert value == %{vox: 1, piano: "test"}
 
       value = filter_value(@params, param: :skills, trim: true, default: [piano: "test"])
-      assert value == %{"vox" => 1, "piano" => "test"}
+      assert value == %{vox: 1, piano: "test"}
     end
 
     test "nil value inside keyword list" do
       value = filter_value(@params, param: :keywords, trim: true, default: [two: 2])
-      assert value == [one: 1, two: 2]
+      assert value == %{one: 1, two: 2}
     end
   end
 
@@ -132,18 +140,18 @@ defmodule Filterable.ParamsTest do
 
     test "nested value not nil" do
       value = filter_value(@params, param: :skills, trim: true, default: %{"vox" => "test"})
-      assert value == %{"vox" => 1, "piano" => nil}
+      assert value == %{vox: 1, piano: nil}
 
       value = filter_value(@params, param: :keywords, trim: true, default: [one: "not one"])
-      assert value == [one: 1, two: nil]
+      assert value == %{one: 1, two: nil}
     end
 
     test "default value not set" do
       value = filter_value(@params, param: :keywords, trim: true, default: ["not one"])
-      assert value == [one: 1, two: nil]
+      assert value == %{one: 1, two: nil}
 
       value = filter_value(@params, param: :skills, trim: true, default: ["not one"])
-      assert value == %{"vox" => 1, "piano" => nil}
+      assert value == %{vox: 1, piano: nil}
     end
   end
 
@@ -160,15 +168,26 @@ defmodule Filterable.ParamsTest do
 
     test "with atom" do
       value = filter_value(@params, param: :keywords, trim: true, cast: :string)
-      assert value == [one: "1", two: nil]
+      assert value == %{one: "1", two: nil}
 
       value = filter_value(@params, param: :friends, trim: true, cast: :integer, allow_blank: true)
       assert value == []
     end
 
+    test "with struct value" do
+      value = filter_value(@params, param: :birthday, cast: :string)
+      assert value == "2017-01-01"
+    end
+
+    test "raises with bang cast function" do
+      assert_raise Filterable.CastError, "Unable to cast 1 to date", fn ->
+        filter_value(@params, param: :keywords, trim: true, cast: :date!)
+      end
+    end
+
     test "with wrong cast param" do
       value = filter_value(@params, param: :keywords, trim: true, cast: %{})
-      assert value == [one: 1, two: nil]
+      assert value == %{one: 1, two: nil}
     end
   end
 end

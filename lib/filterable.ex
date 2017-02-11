@@ -68,9 +68,10 @@ defmodule Filterable do
         |> Keyword.merge(filter_opts)
         |> Keyword.merge(opts)
 
-      value = Params.filter_value(params, options)
-
-      list ++ [{filter_name, value}]
+      case Params.filter_value(params, options) do
+        nil -> list
+        val -> list ++ [{filter_name, val}]
+      end
     end)
   end
 end

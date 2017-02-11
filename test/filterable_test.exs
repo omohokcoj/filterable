@@ -2,32 +2,78 @@ defmodule FilterableTest do
   use ExUnit.Case
   use Filterable
 
-  filterable Filterable.UserListFilters
+  alias Filterable.{User, Repo}
 
-  @users [%{name: "Tom", age: 22},
-          %{name: "Jony", age: 23}]
+  filterable Filterable.UserFilters, share: []
 
-  test "filters using module function" do
-    result = Filterable.apply_filters(@users, [name: "Tom", age: 21], Filterable.UserListFilters)
-    assert result == []
+  describe "birthday" do
+    test "returns user with birthday" do
+      result = User |> apply_filters(birthday: "1968-06-09") |> Repo.all
 
-    result = Filterable.apply_filters(@users, [age: 22], Filterable.UserListFilters)
-    assert result == [List.first(@users)]
+      assert length(result) == 1
+      assert List.first(result).id == 7
+      assert List.first(result).birthday == ~D[1968-06-09]
+    end
+
+    test "raises errors if date param is invalid" do
+      assert_raise Filterable.CastError, "Unable to cast 123 to date", fn ->
+        apply_filters(User, birthday: 123)
+      end
+    end
   end
 
-  test "filters using macro" do
-    result = apply_filters(@users, name: "Tom", age: 21)
-    assert result == []
+  describe "position" do
+    test "returns user with position" do
+      result = User |> apply_filters(position: %{lat: 34, lng: -80}) |> Repo.all
 
-    result = apply_filters(@users, age: "22")
-    assert result == [%{name: "Tom", age: 22}]
+      assert length(result) == 1
+      assert List.first(result).id == 9
+      assert List.first(result).latlng == [34.188195, -80.278694]
+    end
 
-    result = apply_filters(@users, age: 190)
-    assert result == @users
+    test "returns all users if position not set" do
+      result = User |> apply_filters(position: %{}) |> Repo.all
+
+      assert length(result) == 4
+      assert List.first(result).id == 1
+    end
   end
 
-  test "returns filter values" do
-    result = filter_values(name: "Tom", age: 21, about: nil, another: "test")
-    assert result == [name: "Tom", age: 21]
+  describe "paginate" do
+    test "with defaults" do
+      result = User |> apply_filters(%{}) |> Repo.all
+      assert List.first(result).id == 1
+      assert List.last(result).id == 4
+    end
+
+    test "with single record per page" do
+      result = User |> apply_filters(per_page: 1) |> Repo.all
+      assert List.first(result).id == 1
+      assert List.last(result).id == 1
+    end
+
+    test "with second page" do
+      result = User |> apply_filters(page: 2) |> Repo.all
+      assert List.first(result).id == 5
+      assert List.last(result).id == 8
+    end
+
+    test "raises error with very large per_page" do
+      assert_raise Filterable.InvalidParamError, "Per page can't more than 5", fn ->
+        apply_filters(User, per_page: 100)
+      end
+    end
+
+    test "raises error with negative page" do
+      assert_raise Filterable.InvalidParamError, "Page can't be negative", fn ->
+        apply_filters(User, page: -100)
+      end
+    end
+
+    test "raises error with negative per_page" do
+      assert_raise Filterable.InvalidParamError, "Per page can't be negative", fn ->
+        apply_filters(User, per_page: -100)
+      end
+    end
   end
 end
