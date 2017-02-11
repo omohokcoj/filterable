@@ -3,13 +3,17 @@ defmodule Filterable.UtilsTest do
 
   alias Filterable.Utils
 
-  describe "to_atoms_map/1" do
+  describe "ensure_atoms_map/1" do
     test "returns map with atom keys" do
-      assert Utils.to_atoms_map(%{"page" => %{"per_page" => 3}}) == %{page: %{per_page: 3}}
+      assert Utils.ensure_atoms_map(%{"page" => %{"per_page" => 3}}) == %{page: %{per_page: 3}}
     end
 
     test "returns original value if not map" do
-      assert Utils.to_atoms_map("page") == "page"
+      assert Utils.ensure_atoms_map("page") == "page"
+    end
+
+    test "returns struct" do
+      assert Utils.ensure_atoms_map(%{"time" => ~D[2017-01-01]}) == %{time: ~D[2017-01-01]}
     end
   end
 

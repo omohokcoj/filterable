@@ -9,7 +9,7 @@ defmodule Filterable.Params do
     params
     |> fetch_params(top_param_key)
     |> fetch_value(param_key)
-    |> Utils.to_atoms_map
+    |> Utils.ensure_atoms_map
     |> trim_value(trim_opt)
     |> cast_value(cast_opt)
     |> nilify_value(allow_blank_opt)
@@ -20,7 +20,7 @@ defmodule Filterable.Params do
     Enum.map(@available_options, &Keyword.get(opts, &1))
   end
 
-  defp fetch_params(params, key) when is_nil(key) do
+  defp fetch_params(params, nil) do
     params
   end
   defp fetch_params(params, key) do
@@ -37,7 +37,7 @@ defmodule Filterable.Params do
     Utils.get_indifferent(params, key)
   end
 
-  defp trim_value(value, opt) when opt == true do
+  defp trim_value(value, true) do
     trim_value(value)
   end
   defp trim_value(value, _) do
@@ -92,7 +92,7 @@ defmodule Filterable.Params do
   defp default_value(value, default) when not is_map(value) and is_list(default) do
     value
   end
-  defp default_value(value, default) when is_nil(value) do
+  defp default_value(nil, default) do
     default
   end
   defp default_value(value, _) do

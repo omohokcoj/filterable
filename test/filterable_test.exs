@@ -89,7 +89,7 @@ defmodule FilterableTest do
     end
 
     test "raises error with very large per_page" do
-      assert_raise Filterable.InvalidParamError, "Per page can't more than 5", fn ->
+      assert_raise Filterable.InvalidParamError, "Per page can't be more than 5", fn ->
         apply_filters(User, per_page: 100)
       end
     end

@@ -26,10 +26,12 @@ defmodule Filterable.DSL do
     end
   end
 
-  defmacro filter(head = {:when, _, [{name, _, _} | _]}, do: body),
-    do: define_filter(name, head, body)
-  defmacro filter(head = {name, _, _}, do: body),
-    do: define_filter(name, head, body)
+  defmacro filter(head = {:when, _, [{name, _, _} | _]}, do: body) do
+    define_filter(name, head, body)
+  end
+  defmacro filter(head = {name, _, _}, do: body) do
+    define_filter(name, head, body)
+  end
 
   defp define_filter(filter_name, head, body) do
     quote do

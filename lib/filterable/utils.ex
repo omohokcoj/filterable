@@ -1,16 +1,14 @@
 defmodule Filterable.Utils do
-  def to_atoms_map(%{__struct__: _} = value), do: value
-  def to_atoms_map(value) when is_map(value) or is_list(value) do
-    if is_map(value) || (Keyword.keyword?(value) && value != []) do
+  def ensure_atoms_map([]), do: []
+  def ensure_atoms_map(%{__struct__: _} = value), do: value
+  def ensure_atoms_map(value) do
+    if is_map(value) || Keyword.keyword?(value) do
       Enum.into value, %{}, fn ({k, v}) ->
-        {Filterable.Cast.atom(k), to_atoms_map(v)}
+        {if(is_bitstring(k), do: String.to_atom(k), else: k), ensure_atoms_map(v)}
       end
     else
       value
     end
-  end
-  def to_atoms_map(value) do
-    value
   end
 
   def presence(value) when value in ["", [], {}, %{}] do

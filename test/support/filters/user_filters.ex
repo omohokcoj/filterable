@@ -35,7 +35,7 @@ defmodule Filterable.UserFilters do
     raise InvalidParamError, "Per page can't be negative"
   end
   filter paginate(_, %{page: _page, per_page: per_page}, _) when per_page > 5 do
-    raise InvalidParamError, "Per page can't more than 5"
+    raise InvalidParamError, "Per page can't be more than 5"
   end
   filter paginate(query, %{page: page, per_page: per_page}, _) do
     from q in query,
