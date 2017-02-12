@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/omohokcoj/filterable.svg?branch=master)](https://travis-ci.org/omohokcoj/filterable)
 [![Code Climate](https://codeclimate.com/github/omohokcoj/filterable/badges/gpa.svg)](https://codeclimate.com/github/omohokcoj/filterable)
 [![Coverage Status](https://coveralls.io/repos/github/omohokcoj/filterable/badge.svg?branch=master)](https://coveralls.io/github/omohokcoj/filterable?branch=master)
+[![Inline docs](http://inch-ci.org/github/omohokcoj/filterable.svg?branch=master)](http://inch-ci.org/github/omohokcoj/filterable)
 
 Filterable allows to map incoming parameters to filter functions.
 The goal is to provide minimal and easy to use DSL for building filters using pure Elixir.

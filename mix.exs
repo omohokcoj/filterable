@@ -30,12 +30,13 @@ defmodule Filterable.Mixfile do
   end
 
   defp deps do
-    [{:ex_doc, "~> 0.11", only: :dev},
+    [{:ex_doc, "~> 0.11", only: :docs},
      {:credo, "~> 0.5", only: [:dev, :test]},
      {:excoveralls, "~> 0.5", only: :test},
      {:plug, "~> 1.1.2", only: :test},
      {:postgrex, ">= 0.0.0", only: :test},
-     {:ecto, "~> 2.1", only: :test}]
+     {:ecto, "~> 2.1", only: :test},
+     {:inch_ex, only: :docs}]
   end
 
   defp description do
@@ -47,7 +48,6 @@ defmodule Filterable.Mixfile do
   defp package do
     [name: :filterable,
      files: ["lib", "mix.exs", "README*", "config"],
-     contributors: ["Pete Matsyburka"],
      maintainers: ["Pete Matsyburka"],
      licenses: ["MIT"],
      links: %{"GitHub" => @project_url,

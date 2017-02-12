@@ -11,4 +11,10 @@ services:
 env:
   - MIX_ENV=test
 script:
-  - "mix do deps.get, compile, ecto.setup, coveralls.travis"
+  - mix deps.get
+  - mix compile
+  - mix ecto.setup
+  - mix coveralls.travis
+after_script:
+  - MIX_ENV=docs mix deps.get
+  - MIX_ENV=docs mix inch.report
