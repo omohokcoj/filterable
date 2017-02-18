@@ -38,6 +38,26 @@ defmodule Filterable.ParamsTest do
     end
   end
 
+  describe "fetch with keyword list param" do
+    test "with single nested param" do
+      value = filter_value(@params, param: [skills: [:piano]])
+      assert value == %{piano: " "}
+    end
+
+    test "with multiple nested params" do
+      value = filter_value(@params, param: [skills: [:piano], keywords: [:test]])
+      assert value == %{keywords: %{test: nil}, skills: %{piano: " "}}
+    end
+
+    test "with deep nested params" do
+      value = filter_value(@params, param: [skills: [piano: [:other]]])
+      assert value == %{piano: %{other: nil}}
+
+      value = filter_value(@params, param: [skills: [piano: [:other]], other: [:test, :test2]])
+      assert value == %{other: nil, skills: %{piano: %{other: nil}}}
+    end
+  end
+
   describe "fetch nested params" do
     test "with atom key" do
       value = filter_value(@params, top_param: :skills, param: :vox)

@@ -41,7 +41,7 @@ defmodule Filterable.UserFilters do
     from q in query, limit: ^per_page, offset: ^((page - 1) * per_page)
   end
 
-  @options top_param: :sort, param: [:field, :order], default: [order: :desc], cast: :atom
+  @options param: [sort: [:field, :order]], default: [order: :desc], cast: :atom
   filter sort(_, %{field: field, order: _}, _) when not field in ~w(name surname)a do
     raise InvalidParamError, "Unable to sort on #{inspect(field)}, only name and surname allowed"
   end

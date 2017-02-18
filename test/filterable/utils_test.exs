@@ -3,17 +3,17 @@ defmodule Filterable.UtilsTest do
 
   alias Filterable.Utils
 
-  describe "ensure_atoms_map/1" do
+  describe "to_atoms_map/1" do
     test "returns map with atom keys" do
-      assert Utils.ensure_atoms_map(%{"page" => %{"per_page" => 3}}) == %{page: %{per_page: 3}}
+      assert Utils.to_atoms_map(%{"page" => %{"per_page" => 3}}) == %{page: %{per_page: 3}}
     end
 
     test "returns original value if not map" do
-      assert Utils.ensure_atoms_map("page") == "page"
+      assert Utils.to_atoms_map("page") == "page"
     end
 
     test "returns struct" do
-      assert Utils.ensure_atoms_map(%{"time" => ~D[2017-01-01]}) == %{time: ~D[2017-01-01]}
+      assert Utils.to_atoms_map(%{"time" => ~D[2017-01-01]}) == %{time: ~D[2017-01-01]}
     end
   end
 
@@ -41,16 +41,8 @@ defmodule Filterable.UtilsTest do
       assert Utils.get_indifferent(%{"page" => "test"}, :page) == "test"
     end
 
-    test "returns from keyword list using string key" do
-      assert Utils.get_indifferent([page: "test"], "page") == "test"
-    end
-
-    test "returns from keyword list using atom key" do
-      assert Utils.get_indifferent([page: "test"], :page) == "test"
-    end
-
     test "returns nil if value not found" do
-      assert Utils.get_indifferent([page: "test"], "bad_key") == nil
+      assert Utils.get_indifferent(%{page: "test"}, "bad_key") == nil
     end
   end
 

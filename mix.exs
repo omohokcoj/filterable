@@ -3,7 +3,7 @@ defmodule Filterable.Mixfile do
 
   @name "Filterable"
   @project_url "https://github.com/omohokcoj/filterable"
-  @version "0.1.6"
+  @version "0.1.7"
 
   def project do
     [app: :filterable,
@@ -30,13 +30,13 @@ defmodule Filterable.Mixfile do
   end
 
   defp deps do
-    [{:ex_doc, "~> 0.11", only: :docs},
+    [{:ex_doc, "~> 0.11", only: [:dev, :docs]},
      {:credo, "~> 0.5", only: [:dev, :test]},
      {:excoveralls, "~> 0.5", only: :test},
      {:plug, "~> 1.1.2", only: :test},
      {:postgrex, ">= 0.0.0", only: :test},
      {:ecto, "~> 2.1", only: :test},
-     {:inch_ex, only: :docs}]
+     {:inch_ex, only: [:dev, :docs]}]
   end
 
   defp description do
