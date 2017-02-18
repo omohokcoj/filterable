@@ -4,7 +4,14 @@ defmodule Filterable.Params do
   @available_options [:top_param, :param, :trim, :allow_blank, :default, :cast]
 
   def filter_value(params, opts \\ []) do
-    [top_param_key, param_key, trim_opt, allow_blank_opt, default_opt, cast_opt] = fetch_options(opts)
+    [
+      top_param_key,
+      param_key,
+      trim_opt,
+      allow_blank_opt,
+      default_opt,
+      cast_opt
+    ] = fetch_options(opts)
 
     params
     |> Utils.to_atoms_map
