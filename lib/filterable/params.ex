@@ -9,7 +9,7 @@ defmodule Filterable.Params do
     params
     |> fetch_params(top_param_key)
     |> fetch_value(param_key)
-    |> Utils.ensure_atoms_map
+    |> Utils.ensure_atoms_map()
     |> trim_value(trim_opt)
     |> cast_value(cast_opt)
     |> nilify_value(allow_blank_opt)
@@ -90,7 +90,11 @@ defmodule Filterable.Params do
     end
   end
   defp default_value(value, default) when not is_map(value) and is_list(default) do
-    value
+    if Keyword.keyword?(default) do
+      value
+    else
+      value || default
+    end
   end
   defp default_value(nil, default) do
     default

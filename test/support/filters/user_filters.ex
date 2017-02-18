@@ -38,9 +38,7 @@ defmodule Filterable.UserFilters do
     raise InvalidParamError, "Per page can't be more than 5"
   end
   filter paginate(query, %{page: page, per_page: per_page}, _) do
-    from q in query,
-      limit: ^per_page,
-      offset: ^((page - 1) * per_page)
+    from q in query, limit: ^per_page, offset: ^((page - 1) * per_page)
   end
 
   @options top_param: :sort, param: [:field, :order], default: [order: :desc], cast: :atom

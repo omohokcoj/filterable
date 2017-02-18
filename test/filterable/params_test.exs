@@ -118,6 +118,11 @@ defmodule Filterable.ParamsTest do
       assert value == "cool"
     end
 
+    test "list value" do
+      value = filter_value(@params, param: :address, default: ["cool"], trim: true)
+      assert value == ["cool"]
+    end
+
     test "struct value" do
       value = filter_value(@params, param: :address, default: ~D[2017-01-01], trim: true)
       assert value == ~D[2017-01-01]
