@@ -1,7 +1,7 @@
 defmodule Filterable.Phoenix.Controller do
   defmacro __using__(_) do
     quote do
-      import unquote(__MODULE__), only: [filterable: 2, filterable: 1]
+      use Filterable
 
       @before_compile unquote(__MODULE__)
       @filters_module __MODULE__
@@ -20,13 +20,6 @@ defmodule Filterable.Phoenix.Controller do
         options = Keyword.merge(opts, @filter_options)
         Filterable.filter_values(conn.params, @filters_module, options)
       end
-    end
-  end
-
-  defmacro filterable(module, opts \\ []) do
-    quote do
-      @filters_module unquote(module)
-      @filter_options unquote(opts)
     end
   end
 end

@@ -24,14 +24,20 @@ defmodule Filterable do
         options = Keyword.merge(opts, @filter_options)
         Filterable.filter_values(params, @filters_module, options)
       end
+
+      defoverridable [apply_filters: 3, apply_filters: 2, filter_values: 2, filter_values: 1]
     end
   end
 
-  defmacro filterable(module, opts \\ []) do
-    quote do
-      @filters_module unquote(module)
-      @filter_options unquote(opts)
-    end
+  defmacro filterable(arg, opts \\ [])
+  defmacro filterable([do: block], opts) do
+    __filterable__(nil, block, opts)
+  end
+  defmacro filterable(arg, do: block) do
+    __filterable__(nil, block, arg)
+  end
+  defmacro filterable(arg, opts) do
+    __filterable__(arg, nil, opts)
   end
 
   def apply_filters(queryable, params, module, opts \\ []) do
@@ -74,5 +80,19 @@ defmodule Filterable do
         val -> Map.put(acc, filter_name, val)
       end
     end)
+  end
+
+  defp __filterable__(module, block, opts) do
+    quote do
+      @filter_options unquote(opts)
+      @filters_module unquote(module) || Module.concat([__MODULE__, Filterable])
+
+      unless unquote(module) do
+        defmodule @filters_module do
+          use Filterable.DSL
+          unquote(block)
+        end
+      end
+    end
   end
 end

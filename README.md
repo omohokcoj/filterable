@@ -5,7 +5,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/omohokcoj/filterable/badge.svg?branch=master)](https://coveralls.io/github/omohokcoj/filterable?branch=master)
 [![Inline docs](http://inch-ci.org/github/omohokcoj/filterable.svg?branch=master)](http://inch-ci.org/github/omohokcoj/filterable)
 
-Filterable allows to map incoming parameters to filter functions.
+Filterable allows to map incoming query parameters to filter functions.
 The goal is to provide minimal and easy to use DSL for building filters using pure Elixir.
 Filterable doesn't depend on external libraries or frameworks and can be used both in Phoenix and pure Elixir projects.
 Inspired by [has_scope](https://github.com/plataformatec/has_scope).
@@ -15,12 +15,60 @@ Inspired by [has_scope](https://github.com/plataformatec/has_scope).
 Add `filterable` to your mix.exs.
 
 ```elixir
-{:filterable, "~> 0.1.7"}
+{:filterable, "~> 0.2.0"}
 ```
 
 ## Usage
 
-Common usage:
+#### Phoenix controller
+```elixir
+defmodule MyApp.PostController do
+  use MyApp.Web, :controller
+  use Filterable.Phoenix.Controller
+
+  filterable do
+    filter author(query, value, _conn) do
+      query |> where(author_name: ^value)
+    end
+  end
+
+  # /?author=Tom
+  def index(conn, params, conn) do
+    posts = Post |> apply_filters(conn) |> Repo.all
+    render(conn, "index.json-api", data: posts)
+  end
+end
+```
+
+#### Phoenix model
+```elixir
+defmodule MyApp.Post do
+  use MyApp.Web, :model
+  use Filterable.Phoenix.Model
+
+  filterable do
+    filter author(query, value, _conn) do
+      query |> where(author_name: ^value)
+    end
+  end
+
+  schema "posts" do
+    ...
+  end
+end
+
+# /?author=Tom
+def index(conn, params, conn) do
+  posts = conn |> Post.apply_filters |> Repo.all
+  render(conn, "index.json-api", data: posts)
+end
+```
+
+## Defining filters
+
+*TODO*
+
+## Common usage
 
 ```elixir
 defmodule RepoFilters do
@@ -40,34 +88,12 @@ repos = [%{name: "phoenix", stars: 8565}, %{name: "ecto", start: 2349}]
 RepoFilters.apply_filters(repos, %{name: "phoenix", stars: 8000})
 ```
 
-Phoenix usage:
-
-```elixir
-defmodule MyApp.PostController do
-  use MyApp.Web, :controller
-  use Filterable.DSL
-
-  @options allow_nil: true
-  filter author(query, value, current_user) when is_nil(value) do
-    query |> where(author_id: ^current_user.id)
-  end
-  filter author(query, value, _current_user) do
-    query |> where(author_name: ^value)
-  end
-
-  def index(conn, params, current_user) do
-    posts = Post |> apply_filters(params, share: current_user) |> Repo.all
-    render(conn, "index.json-api", data: posts)
-  end
-end
-```
-
 ## TODO:
 
-- [ ] Coverage 100%
+- [X] Coverage 100%
 - [ ] Update README
 - [ ] Documentation
-- [ ] Improve tests
+- [X] Improve tests
 
 ## Contribution
 

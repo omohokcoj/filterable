@@ -3,7 +3,7 @@ defmodule Filterable.Mixfile do
 
   @name "Filterable"
   @project_url "https://github.com/omohokcoj/filterable"
-  @version "0.1.7"
+  @version "0.2.0"
 
   def project do
     [app: :filterable,
@@ -41,7 +41,7 @@ defmodule Filterable.Mixfile do
 
   defp description do
     """
-    Allows to build filters in Elixir with easy to use DSL inspired by Rails has_scope.
+    Allows to map incoming query parameters to filter function with easy to use DSL inspired by Rails has_scope.
     """
   end
 
@@ -58,7 +58,7 @@ defmodule Filterable.Mixfile do
   defp applications(_), do: applications()
   defp applications(), do: ~w(logger)a
 
-  defp elixirc_paths(:test), do: elixirc_paths() ++ ~w(test/support)
+  defp elixirc_paths(:test), do: elixirc_paths() ++ ~w(test/support/repo.ex)
   defp elixirc_paths(_), do: elixirc_paths()
   defp elixirc_paths(), do: ~w(lib)
 

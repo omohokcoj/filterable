@@ -1,9 +1,19 @@
 defmodule Filterable.User do
   use Ecto.Schema
-
   use Filterable.Phoenix.Model
 
-  filterable Filterable.UserFilters
+  import Ecto.Query
+
+  filterable share: false do
+    filter name(query, value) do
+      query |> where(name: ^value)
+    end
+
+    @options cast: :integer
+    filter age(query, value) when value < 120 do
+      query |> where(age: ^value)
+    end
+  end
 
   schema "users" do
     field :gender,         :string
