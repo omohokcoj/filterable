@@ -14,10 +14,10 @@ defmodule Filterable.Params do
     ] = fetch_options(opts)
 
     params
-    |> Utils.to_atoms_map
+    |> Utils.to_atoms_map()
     |> fetch_params(top_param_key)
     |> fetch_value(param_key)
-    |> normalize_map
+    |> normalize_map()
     |> trim_value(trim_opt)
     |> cast_value(cast_opt)
     |> nilify_value(allow_blank_opt)
@@ -32,7 +32,7 @@ defmodule Filterable.Params do
     params
   end
   defp fetch_params(params, key) do
-    Utils.get_indifferent(params, key)
+    Map.get(params, Utils.ensure_atom(key))
   end
 
   defp fetch_value(nil, _) do
@@ -40,15 +40,15 @@ defmodule Filterable.Params do
   end
   defp fetch_value(params, key) when is_list(key) do
     if Keyword.keyword?(key) do
-      Enum.reduce key, %{}, fn ({k, v}, acc) ->
-        Map.put(acc, k, fetch_value(fetch_value(params, k), v))
+      Enum.into key, %{}, fn ({k, v}) ->
+        {k, fetch_value(Map.get(params, k), v)}
       end
     else
       Enum.into(key, %{}, &{&1, fetch_value(params, &1)})
     end
   end
   defp fetch_value(params, key) when is_map(params) do
-    Utils.get_indifferent(params, key)
+    Map.get(params, Utils.ensure_atom(key))
   end
   defp fetch_value(_, _) do
     nil

@@ -30,15 +30,12 @@ defmodule Filterable do
   end
 
   defmacro filterable(arg, opts \\ [])
-  defmacro filterable([do: block], opts) do
-    __filterable__(nil, block, opts)
-  end
-  defmacro filterable(arg, do: block) do
-    __filterable__(nil, block, arg)
-  end
-  defmacro filterable(arg, opts) do
-    __filterable__(arg, nil, opts)
-  end
+  defmacro filterable([do: block], opts),
+    do: filterable(nil, block, opts)
+  defmacro filterable(arg, do: block),
+    do: filterable(nil, block, arg)
+  defmacro filterable(arg, opts),
+    do: filterable(arg, nil, opts)
 
   def apply_filters(queryable, params, module, opts \\ []) do
     values = filter_values(params, module, opts)
@@ -82,12 +79,12 @@ defmodule Filterable do
     end)
   end
 
-  defp __filterable__(module, block, opts) do
+  defp filterable(module, block, opts) do
     quote do
       @filter_options unquote(opts)
       @filters_module unquote(module) || Module.concat([__MODULE__, Filterable])
 
-      unless unquote(module) do
+      if unquote(is_tuple(block)) do
         defmodule @filters_module do
           use Filterable.DSL
           unquote(block)

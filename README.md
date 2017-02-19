@@ -32,7 +32,7 @@ defmodule MyApp.PostController do
     end
   end
 
-  # /?author=Tom
+  # /posts?author=Tom
   def index(conn, params, conn) do
     posts = Post |> apply_filters(conn) |> Repo.all
     render(conn, "index.json-api", data: posts)
@@ -57,7 +57,7 @@ defmodule MyApp.Post do
   end
 end
 
-# /?author=Tom
+# /posts?author=Tom
 def index(conn, params, conn) do
   posts = conn |> Post.apply_filters |> Repo.all
   render(conn, "index.json-api", data: posts)

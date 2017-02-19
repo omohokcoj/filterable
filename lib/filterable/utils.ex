@@ -11,21 +11,17 @@ defmodule Filterable.Utils do
     end
   end
 
+  def ensure_atom(value) when is_bitstring(value) do
+    String.to_atom(value)
+  end
+  def ensure_atom(value) when is_atom(value) do
+    value
+  end
+
   def presence(value) when value in ["", [], {}, %{}] do
     nil
   end
   def presence(value) do
     value
-  end
-
-  def get_indifferent(map, key, default \\ nil)
-  def get_indifferent(map, key, default) when is_nil(key) or is_nil(map) do
-    default
-  end
-  def get_indifferent(map, key, default) when is_bitstring(key) do
-    Map.get(map, key) || Map.get(map, String.to_atom(key), default)
-  end
-  def get_indifferent(map, key, default) when is_atom(key) do
-    Map.get(map, key) || Map.get(map, Atom.to_string(key), default)
   end
 end

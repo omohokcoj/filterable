@@ -32,23 +32,17 @@ defmodule Filterable.UtilsTest do
     end
   end
 
-  describe "get_indifferent/2" do
-    test "returns from map using string key" do
-      assert Utils.get_indifferent(%{page: "test"}, "page") == "test"
+  describe "ensure_atom/1" do
+    test "when value is atom" do
+      assert Utils.ensure_atom(:test) == :test
     end
 
-    test "returns from map using atom key" do
-      assert Utils.get_indifferent(%{"page" => "test"}, :page) == "test"
+    test "when value is bitsring" do
+      assert Utils.ensure_atom("test") == :test
     end
 
-    test "returns nil if value not found" do
-      assert Utils.get_indifferent(%{page: "test"}, "bad_key") == nil
-    end
-  end
-
-  describe "get_indifferent/3" do
-    test "returns default value" do
-      assert Utils.get_indifferent(%{page: "test"}, nil, "default") == "default"
+    test "when value is nil" do
+      assert Utils.ensure_atom(nil) == nil
     end
   end
 end
