@@ -11,17 +11,9 @@ defmodule Filterable.Utils do
     end
   end
 
-  def ensure_atom(value) when is_bitstring(value) do
-    String.to_atom(value)
-  end
-  def ensure_atom(value) when is_atom(value) do
-    value
-  end
+  def ensure_atom(value) when is_bitstring(value), do: String.to_atom(value)
+  def ensure_atom(value) when is_atom(value), do: value
 
-  def presence(value) when value in ["", [], {}, %{}] do
-    nil
-  end
-  def presence(value) do
-    value
-  end
+  def presence(value) when value in ["", [], {}, %{}], do: nil
+  def presence(value), do: value
 end

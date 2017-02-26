@@ -1,31 +1,18 @@
 defmodule Filterable.Params do
   alias Filterable.Utils
 
-  @available_options [:top_param, :param, :trim, :allow_blank, :default, :cast]
-
   def filter_value(params, opts \\ []) do
-    [
-      top_param_key,
-      param_key,
-      trim_opt,
-      allow_blank_opt,
-      default_opt,
-      cast_opt
-    ] = fetch_options(opts)
-
-    params
-    |> Utils.to_atoms_map()
-    |> fetch_params(top_param_key)
-    |> fetch_value(param_key)
-    |> normalize_map()
-    |> trim_value(trim_opt)
-    |> cast_value(cast_opt)
-    |> nilify_value(allow_blank_opt)
-    |> default_value(default_opt)
-  end
-
-  defp fetch_options(opts) do
-    Enum.map(@available_options, &Keyword.get(opts, &1))
+    with params <- Utils.to_atoms_map(params),
+         params <- fetch_params(params, Keyword.get(opts, :top_param)),
+         value  <- fetch_value(params, Keyword.get(opts, :param)),
+         value  <- normalize_map(value),
+         value  <- trim_value(value, Keyword.get(opts, :trim)),
+         value  <- cast_value(value, Keyword.get(opts, :cast)),
+         value  <- nilify_value(value, Keyword.get(opts, :allow_blank)),
+         value  <- default_value(value, Keyword.get(opts, :default)),
+    do: {:ok, value}
+  rescue e in Filterable.CastError ->
+    {:error, e.message}
   end
 
   defp fetch_params(params, nil) do
@@ -140,7 +127,7 @@ defmodule Filterable.Params do
     value |> Enum.map(&cast_value(&1, cast)) |> Enum.reject(&is_nil/1)
   end
   defp cast_value(value, cast) when is_list(cast) do
-    Enum.reduce(cast, value, &(&1.(&2)))
+    Enum.reduce(cast, value, &cast_value(&2, &1))
   end
   defp cast_value(value, cast) when is_function(cast) do
     cast.(value)

@@ -11,14 +11,20 @@ defmodule Filterable.Phoenix.Controller do
 
   defmacro __before_compile__(_) do
     quote do
+      def apply_filters!(queryable, %Plug.Conn{} = conn, opts \\ []) do
+        Filterable.apply_filters!(queryable, conn.params, @filters_module, filter_options(conn, opts))
+      end
+
       def apply_filters(queryable, %Plug.Conn{} = conn, opts \\ []) do
-        options = [share: conn] |> Keyword.merge(opts) |> Keyword.merge(@filter_options)
-        Filterable.apply_filters(queryable, conn.params, @filters_module, options)
+        Filterable.apply_filters(queryable, conn.params, @filters_module, filter_options(conn, opts))
       end
 
       def filter_values(%Plug.Conn{} = conn, opts \\ []) do
-        options = Keyword.merge(opts, @filter_options)
-        Filterable.filter_values(conn.params, @filters_module, options)
+        Filterable.filter_values(conn.params, @filters_module, filter_options(conn, opts))
+      end
+
+      def filter_options(conn, opts \\ []) do
+        [share: conn] |> Keyword.merge(opts) |> Keyword.merge(@filter_options)
       end
     end
   end

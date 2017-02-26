@@ -10,6 +10,10 @@ defmodule Filterable.DSL do
 
   defmacro __before_compile__(_) do
     quote do
+      def apply_filters!(queryable, params, opts \\ []) do
+        Filterable.apply_filters!(queryable, params, __MODULE__, opts)
+      end
+
       def apply_filters(queryable, params, opts \\ []) do
         Filterable.apply_filters(queryable, params, __MODULE__, opts)
       end
@@ -22,7 +26,9 @@ defmodule Filterable.DSL do
         Enum.reverse(@filters)
       end
 
-      defoverridable [apply_filters: 3, apply_filters: 2, filter_values: 2, filter_values: 1]
+      defoverridable [apply_filters!: 3, apply_filters!: 2,
+                      apply_filters: 3, apply_filters: 2,
+                      filter_values: 2, filter_values: 1]
     end
   end
 
