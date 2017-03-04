@@ -13,7 +13,7 @@ defmodule Filterable.UserFilters do
     query |> where(age: ^value)
   end
 
-  @options cast: :date!
+  @options cast: :date
   filter birthday(query, value, _) do
     query |> where(birthday: ^value)
   end

@@ -1,16 +1,7 @@
 defmodule Filterable.Cast do
-  @cast_types ~w(integer float string atom date datetime)a
-
-  # Define functions that raises error.
-  for type <- @cast_types do
-    def unquote(String.to_atom(Atom.to_string(type) <> "!"))(value) do
-      cast!(unquote(type), value)
-    end
-  end
-
   def integer(value) when is_bitstring(value) do
     case Integer.parse(value) do
-      :error -> nil
+      :error   -> :error
       {int, _} -> int
     end
   end
@@ -21,12 +12,12 @@ defmodule Filterable.Cast do
     value
   end
   def integer(_) do
-    nil
+    :error
   end
 
   def float(value) when is_bitstring(value) do
     case Float.parse(value) do
-      :error -> nil
+      :error   -> :error
       {int, _} -> int
     end
   end
@@ -37,7 +28,7 @@ defmodule Filterable.Cast do
     value
   end
   def float(_) do
-    nil
+    :error
   end
 
   def string(value) when is_bitstring(value) do
@@ -54,40 +45,32 @@ defmodule Filterable.Cast do
     value
   end
   def atom(_) do
-    nil
+    :error
   end
 
   def date(value) when is_bitstring(value) do
     case Date.from_iso8601(value) do
-      {:ok, val} -> val
-      {:error, _} -> nil
+      {:ok, val}  -> val
+      {:error, _} -> :error
     end
   end
   def date(%Date{} = value) do
     value
   end
   def date(_) do
-    nil
+    :error
   end
 
   def datetime(value) when is_bitstring(value) do
     case NaiveDateTime.from_iso8601(value) do
-      {:ok, val} -> val
-      {:error, _} -> nil
+      {:ok, val}  -> val
+      {:error, _} -> :error
     end
   end
   def datetime(%NaiveDateTime{} = value) do
     value
   end
   def datetime(_) do
-    nil
-  end
-
-  defp cast!(_, nil), do: nil
-  defp cast!(type, value) do
-    case apply(__MODULE__, type, [value]) do
-      nil -> raise Filterable.CastError, type: type, value: value
-      val -> val
-    end
+    :error
   end
 end

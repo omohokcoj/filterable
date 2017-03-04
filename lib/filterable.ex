@@ -1,7 +1,7 @@
 defmodule Filterable do
   alias Filterable.{Params, Utils}
 
-  @default_options [allow_blank: false, allow_nil: false, trim: true, default: nil, cast: nil]
+  @default_options [allow_blank: false, allow_nil: false, trim: true, default: nil, cast: nil, cast_errors: true]
 
   defmacro __using__(_) do
     quote do

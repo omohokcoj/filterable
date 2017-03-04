@@ -2,17 +2,15 @@ defmodule Filterable.Params do
   alias Filterable.Utils
 
   def filter_value(params, opts \\ []) do
-    with params <- Utils.to_atoms_map(params),
-         params <- fetch_params(params, Keyword.get(opts, :top_param)),
-         value  <- fetch_value(params, Keyword.get(opts, :param)),
-         value  <- normalize_map(value),
-         value  <- trim_value(value, Keyword.get(opts, :trim)),
-         value  <- cast_value(value, Keyword.get(opts, :cast)),
-         value  <- nilify_value(value, Keyword.get(opts, :allow_blank)),
-         value  <- default_value(value, Keyword.get(opts, :default)),
-    do: {:ok, value}
-  rescue e in Filterable.CastError ->
-    {:error, e.message}
+    with params       <- Utils.to_atoms_map(params),
+         params       <- fetch_params(params, Keyword.get(opts, :top_param)),
+         value        <- fetch_value(params, Keyword.get(opts, :param)),
+         value        <- normalize_map(value),
+         value        <- trim_value(value, Keyword.get(opts, :trim)),
+         {:ok, value} <- cast_value(value, Keyword.get(opts, :cast), Keyword.get(opts, :cast_errors)),
+         value        <- nilify_value(value, Keyword.get(opts, :allow_blank)),
+         value        <- default_value(value, Keyword.get(opts, :default)),
+     do: {:ok, value}
   end
 
   defp fetch_params(params, nil) do
@@ -114,28 +112,72 @@ defmodule Filterable.Params do
     value
   end
 
-  defp cast_value(value, nil) do
-    value
+  defp cast_value(value, nil, _) do
+    {:ok, value}
   end
-  defp cast_value(%{__struct__: _} = value, cast) do
+  defp cast_value(%{__struct__: _} = value, cast, errors) do
+    cast(value, cast, errors)
+  end
+  defp cast_value(value, cast, errors) when is_map(value) do
+    Utils.reduce_with value, %{}, fn ({k, v}, acc) ->
+      case cast(v, cast, errors) do
+        error = {:error, _} -> error
+        {:ok, val}          -> Map.put(acc, k, val)
+      end
+    end
+  end
+  defp cast_value(value, cast, errors) when is_list(value) do
+    Utils.reduce_with value, [], fn (val, acc) ->
+      case cast(val, cast, errors) do
+        error = {:error, _} -> error
+        {:ok, nil}          -> acc
+        {:ok, val}          -> acc ++ [val]
+      end
+    end
+  end
+  defp cast_value(value, cast, errors) do
+    cast(value, cast, errors)
+  end
+
+  defp cast(value, cast, errors) when is_list(cast) do
+    Utils.reduce_with cast, value, fn (c, val) ->
+      case cast(val, c, errors) do
+        error = {:error, _} -> error
+        {:ok, val}          -> val
+      end
+    end
+  end
+  defp cast(value, cast, true) do
+    case cast(value, cast) do
+      :error              -> {:error, cast_error_message(value: value, cast: cast)}
+      error = {:error, _} -> error
+      value               -> {:ok, value}
+    end
+  end
+  defp cast(value, cast, _) do
+    case cast(value, cast) do
+      :error      -> {:ok, nil}
+      {:error, _} -> {:ok, nil}
+      value       -> {:ok, value}
+    end
+  end
+  defp cast(nil, _) do
+    nil
+  end
+  defp cast(value, cast) when is_atom(cast) do
     apply(Filterable.Cast, cast, [value])
   end
-  defp cast_value(value, cast) when is_map(value) do
-    Enum.into(value, %{}, fn ({k, v}) -> {k, cast_value(v, cast)} end)
-  end
-  defp cast_value(value, cast) when is_list(value) do
-    value |> Enum.map(&cast_value(&1, cast)) |> Enum.reject(&is_nil/1)
-  end
-  defp cast_value(value, cast) when is_list(cast) do
-    Enum.reduce(cast, value, &cast_value(&2, &1))
-  end
-  defp cast_value(value, cast) when is_function(cast) do
+  defp cast(value, cast) when is_function(cast) do
     cast.(value)
   end
-  defp cast_value(value, cast) when is_atom(cast) do
-    apply(Filterable.Cast, cast, [value])
-  end
-  defp cast_value(value, _) do
+  defp cast(value, _) do
     value
+  end
+
+  defp cast_error_message(value: value, cast: cast) when is_function(cast) do
+    "Unable to cast #{inspect(value)} using #{inspect(cast)}"
+  end
+  defp cast_error_message(value: value, cast: cast) when is_atom(cast) do
+    "Unable to cast #{inspect(value)} to #{to_string(cast)}"
   end
 end

@@ -209,10 +209,38 @@ defmodule Filterable.ParamsTest do
     test "returns casted struct value" do
       {:ok, value} = filter_value(@params, param: :birthday, cast: :string)
       assert value == "2017-01-01"
+
+      {:ok, value} = filter_value(@params, param: :birthday, cast: &Filterable.Cast.string/1)
+      assert value == "2017-01-01"
     end
 
-    test "returns error tuple using bang cast function" do
-      assert {:error, "Unable to cast 1 to date"} = filter_value(@params, param: :keywords, trim: true, cast: :date!)
+    test "returns casted map value" do
+      {:ok, value} = filter_value(@params, param: :skills, cast: :integer)
+      assert value == %{vox: 1, piano: nil}
+    end
+
+    test "returns error if unable to cast" do
+      assert {:error, "Unable to cast 1 to date"} = filter_value(@params, param: :keywords, trim: true, cast: :date, cast_errors: true)
+      assert {:error, "Unable to cast 1 using &Filterable.Cast.date/1"} =
+        filter_value(@params, param: :keywords, trim: true, cast: &Filterable.Cast.date/1, cast_errors: true)
+    end
+
+    test "returns error if unable to cast with list" do
+      assert {:error, "Unable to cast ~D[2017-01-01] to integer"} =
+        filter_value(@params, param: :birthday, cast: [:integer], cast_errors: true)
+    end
+
+    test "returns custom error message" do
+      assert {:error, :invalid_format} =
+        filter_value(@params, param: :friends, trim: true, cast: &NaiveDateTime.from_iso8601/1, cast_errors: true)
+    end
+
+    test "returns original list value" do
+      assert {:ok, ["Jonny "]} = filter_value(@params, param: :friends, cast: [:string], cast_errors: true)
+    end
+
+    test "returns :ok if cast_errors false" do
+      assert {:ok, nil} = filter_value(@params, param: :birthday, cast: [:integer], cast_errors: false)
     end
   end
 end
