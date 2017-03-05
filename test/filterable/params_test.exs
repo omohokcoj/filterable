@@ -165,6 +165,11 @@ defmodule Filterable.ParamsTest do
       assert value == "Tom"
     end
 
+    test "value nil" do
+      {:ok, value} = filter_value(@params, param: :address, trim: true, default: [vox: "test"])
+      assert value == nil
+    end
+
     test "nested value not nil" do
       {:ok, value} = filter_value(@params, param: :skills, trim: true, default: [vox: "test"])
       assert value == %{vox: 1, piano: nil}

@@ -103,6 +103,7 @@ defmodule Filterable do
       if unquote(is_tuple(block)) do
         defmodule @filters_module do
           use Filterable.DSL
+          use Filterable.Phoenix.Helpers
           unquote(block)
         end
       end

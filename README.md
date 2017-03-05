@@ -15,7 +15,7 @@ Inspired by [has_scope](https://github.com/plataformatec/has_scope).
 Add `filterable` to your mix.exs.
 
 ```elixir
-{:filterable, "~> 0.3.0"}
+{:filterable, "~> 0.4.0"}
 ```
 
 ## Usage
@@ -36,7 +36,7 @@ defmodule MyApp.PostController do
   def index(conn, params) do
     with {:ok, query, filter_values} <- apply_filters(Post, conn),
          posts                       <- Repo.all(query),
-    do: render(conn, "index.json", posts: posts, meta: filter_values)
+     do: render(conn, "index.json", posts: posts, meta: filter_values)
   end
 end
 ```
@@ -70,7 +70,7 @@ end
 def index(conn, params, conn) do
   with {:ok, query, filter_values} <- Post.apply_filters(conn),
        posts                       <- Repo.all(query),
-  do: render(conn, "index.json", posts: posts, meta: filter_values)
+   do: render(conn, "index.json", posts: posts, meta: filter_values)
 end
 ```
 

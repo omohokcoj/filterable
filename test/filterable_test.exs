@@ -42,7 +42,7 @@ defmodule FilterableTest do
 
   describe "sort" do
     test "returns users sorted by name asc" do
-      {:ok, query, _} = apply_filters(User, sort: %{field: "name", order: "asc"})
+      {:ok, query, _} = apply_filters(User, %{sort: "name", order: "asc"})
       result = Repo.all(query)
 
       assert length(result) == 4
@@ -51,7 +51,7 @@ defmodule FilterableTest do
     end
 
     test "returns users sorted by surname" do
-      {:ok, query, _} = apply_filters(User, sort: %{field: "surname"})
+      {:ok, query, _} = apply_filters(User, %{sort: "surname"})
       result = Repo.all(query)
 
       assert length(result) == 4
@@ -60,12 +60,12 @@ defmodule FilterableTest do
     end
 
     test "returns error if sort direction invalid" do
-      {:error, message} = apply_filters(User, sort: %{field: :name, order: :test})
+      {:error, message} = apply_filters(User, %{sort: :name, order: :test})
       assert message == "Unable to sort using :test, only 'asc' and 'desc' allowed"
     end
 
     test "raises error if sort field invalid" do
-      {:error, message} = apply_filters(User, sort: %{field: :test, order: :desc})
+      {:error, message} = apply_filters(User, %{sort: :test, order: :desc})
       assert message == "Unable to sort on :test, only name and surname allowed"
     end
   end
@@ -96,20 +96,64 @@ defmodule FilterableTest do
     end
 
     test "raises error if very large per_page" do
-      assert_raise Filterable.FilterError, "Per page can't be more than 5", fn ->
+      assert_raise Filterable.FilterError, "per_page can't be more than 4", fn ->
         apply_filters!(User, per_page: 100)
       end
     end
 
     test "returns error tuple if negative page" do
-      assert_raise Filterable.FilterError, "Page can't be negative", fn ->
+      assert_raise Filterable.FilterError, "page can't be negative", fn ->
         apply_filters!(User, page: -100)
       end
     end
 
     test "returns error tuple if negative per_page" do
-      assert_raise Filterable.FilterError, "Per page can't be negative", fn ->
+      assert_raise Filterable.FilterError, "per_page can't be negative", fn ->
         apply_filters!(User, per_page: -100)
+      end
+    end
+  end
+
+  describe "limit offset" do
+    test "returns result using default params" do
+      {query, _} = User.apply_filters!(%Plug.Conn{params: %{}})
+      result = Repo.all(query)
+
+      assert List.first(result).id == 1
+      assert List.last(result).id == 10
+    end
+
+    test "returns single record" do
+      {query, _} = User.apply_filters!(%Plug.Conn{params: %{"limit" => 1}})
+      result = Repo.all(query)
+
+      assert List.first(result).id == 1
+      assert List.last(result).id == 1
+    end
+
+    test "returns second record" do
+      {query, _} = User.apply_filters!(%Plug.Conn{params: %{limit: 1, offset: 1}})
+      result = Repo.all(query)
+
+      assert List.first(result).id == 2
+      assert List.last(result).id == 2
+    end
+
+    test "raises error if very large limit" do
+      assert_raise Filterable.FilterError, "limit can't be more than 20", fn ->
+        User.apply_filters!(%Plug.Conn{params: %{limit: 2000, offset: 1}})
+      end
+    end
+
+    test "returns error tuple if negative limit" do
+      assert_raise Filterable.FilterError, "limit can't be negative", fn ->
+        User.apply_filters!(%Plug.Conn{params: %{limit: -2000, offset: 1}})
+      end
+    end
+
+    test "returns error tuple if negative offset" do
+      assert_raise Filterable.FilterError, "offset can't be negative", fn ->
+        User.apply_filters!(%Plug.Conn{params: %{limit: 1, offset: -1}})
       end
     end
   end
