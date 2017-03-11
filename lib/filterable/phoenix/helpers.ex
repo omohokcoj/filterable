@@ -5,21 +5,21 @@ defmodule Filterable.Phoenix.Helpers do
     end
   end
 
-  defmacro searchable(field, opts \\ []) do
+  defmacro field(name, opts \\ []) do
     quote do
       @options unquote(opts) |> Keyword.merge(share: false)
-      filter unquote(field)(query, value) do
-        query |> Ecto.Query.where([{unquote(field), ^value}])
+      filter unquote(name)(query, value) do
+        query |> Ecto.Query.where([{unquote(name), ^value}])
       end
     end
   end
 
   defmacro paginateable(opts \\ []) do
-    max_per_page = Keyword.get(opts, :max_per_page, 20)
+    per_page = Keyword.get(opts, :per_page, 20)
 
     quote do
       @options param: [:page, :per_page],
-               default: [page: 1, per_page: unquote(max_per_page)],
+               default: [page: 1, per_page: unquote(per_page)],
                cast: :integer, share: false
       filter paginate(_, %{page: page, per_page: _}) when page < 0 do
         {:error, "page can't be negative"}
@@ -27,8 +27,8 @@ defmodule Filterable.Phoenix.Helpers do
       filter paginate(_, %{page: _page, per_page: per_page}) when per_page < 0 do
         {:error, "per_page can't be negative"}
       end
-      filter paginate(_, %{page: _page, per_page: per_page}) when per_page > unquote(max_per_page) do
-        {:error, "per_page can't be more than #{unquote(max_per_page)}"}
+      filter paginate(_, %{page: _page, per_page: per_page}) when per_page > unquote(per_page) do
+        {:error, "per_page can't be more than #{unquote(per_page)}"}
       end
       filter paginate(query, %{page: page, per_page: per_page}) do
         Ecto.Query.from q in query, limit: ^per_page, offset: ^((page - 1) * per_page)
@@ -55,15 +55,15 @@ defmodule Filterable.Phoenix.Helpers do
   end
 
   defmacro limitable(opts \\ []) do
-    max_limit = Keyword.get(opts, :max_limit, 20)
+    limit = Keyword.get(opts, :limit)
 
     quote do
-      @options default: unquote(max_limit), cast: :integer, share: false
+      @options default: unquote(limit), cast: :integer, share: false
       filter limit(_, value) when value < 0 do
         {:error, "limit can't be negative"}
       end
-      filter limit(_, value) when value > unquote(max_limit) do
-        {:error, "limit can't be more than #{unquote(max_limit)}"}
+      filter limit(_, value) when value > unquote(limit) do
+        {:error, "limit can't be more than #{unquote(limit)}"}
       end
       filter limit(query, value) do
         query |> Ecto.Query.limit(^value)

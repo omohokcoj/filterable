@@ -4,9 +4,9 @@ defmodule Filterable.UserFilters do
 
   import Ecto.Query
 
-  searchable :name
+  field :name
   orderable [:name, :surname]
-  paginateable max_per_page: 4
+  paginateable per_page: 4
 
   @options cast: :integer, share: false
   filter age(query, value) when value < 120 do

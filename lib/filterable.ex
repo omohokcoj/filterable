@@ -44,6 +44,16 @@ defmodule Filterable do
   defmacro filterable(arg, opts),
     do: filterable(arg, nil, opts)
 
+  defmacro define_module(module, do: block) do
+    quote do
+      defmodule unquote(module) do
+        use Filterable.DSL
+        use Filterable.Phoenix.Helpers
+        unquote(block)
+      end
+    end
+  end
+
   def apply_filters!(queryable, params, module, opts \\ []) do
     case apply_filters(queryable, params, module, opts) do
       {:ok, result, values} -> {result, values}
@@ -101,11 +111,7 @@ defmodule Filterable do
       @filters_module unquote(module) || Module.concat([__MODULE__, Filterable])
 
       if unquote(is_tuple(block)) do
-        defmodule @filters_module do
-          use Filterable.DSL
-          use Filterable.Phoenix.Helpers
-          unquote(block)
-        end
+        Filterable.define_module(@filters_module, do: unquote(block))
       end
     end
   end

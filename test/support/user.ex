@@ -5,8 +5,9 @@ defmodule Filterable.User do
   import Ecto.Query
 
   filterable share: false do
-    searchable(:name)
-    limitable()
+    field :name
+
+    limitable limit: 20
 
     @options cast: :integer
     filter age(query, value) when value < 120 do
