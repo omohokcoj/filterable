@@ -11,15 +11,15 @@ defmodule Filterable.DSL do
   defmacro __before_compile__(_) do
     quote do
       def apply_filters!(queryable, params, opts \\ []) do
-        Filterable.apply_filters!(__MODULE__, queryable, params, opts)
+        Filterable.apply_filters!(queryable, params, __MODULE__, opts)
       end
 
       def apply_filters(queryable, params, opts \\ []) do
-        Filterable.apply_filters(__MODULE__, queryable, params, opts)
+        Filterable.apply_filters(queryable, params, __MODULE__, opts)
       end
 
       def filter_values(params, opts \\ []) do
-        Filterable.filter_values(__MODULE__, params, opts)
+        Filterable.filter_values(params, __MODULE__, opts)
       end
 
       def defined_filters do
