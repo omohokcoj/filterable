@@ -102,7 +102,7 @@ defmodule Filterable.Params do
     if Keyword.keyword?(default) do
       value
     else
-      value || default
+      is_nil(value) && default || value
     end
   end
   defp default_value(nil, default) do

@@ -31,6 +31,20 @@ defmodule Filterable.Cast do
     :error
   end
 
+  def boolean(value) when is_bitstring(value) do
+    cond do
+      value in ["true", "t"]  -> true
+      value in ["false", "f"] -> false
+      true                    -> :error
+    end
+  end
+  def boolean(value) when is_boolean(value) do
+    value
+  end
+  def boolean(_) do
+    :error
+  end
+
   def string(value) when is_bitstring(value) do
     value
   end

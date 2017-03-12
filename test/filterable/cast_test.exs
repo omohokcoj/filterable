@@ -32,6 +32,21 @@ defmodule Filterable.CastTest do
     end
   end
 
+  describe "boolean/1" do
+    test "returns casted value" do
+      assert Cast.boolean("true") == true
+      assert Cast.boolean("f") == false
+    end
+
+    test "returns original value" do
+      assert Cast.boolean(true) == true
+    end
+
+    test "returns :error if unable to cast" do
+      assert Cast.boolean("asd") == :error
+    end
+  end
+
   describe "string/1" do
     test "returns casted value" do
       assert Cast.string(123.123) == "123.123"

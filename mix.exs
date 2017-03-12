@@ -3,7 +3,7 @@ defmodule Filterable.Mixfile do
 
   @name "Filterable"
   @project_url "https://github.com/omohokcoj/filterable"
-  @version "0.4.0"
+  @version "0.5.0"
 
   def project do
     [app: :filterable,
@@ -63,7 +63,7 @@ defmodule Filterable.Mixfile do
   defp elixirc_paths(), do: ~w(lib)
 
   defp docs do
-    [main: @name,
+    [main: "readme",
      source_url: @project_url,
      extras: ["README.md"]]
   end

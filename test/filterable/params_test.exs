@@ -11,7 +11,8 @@ defmodule Filterable.ParamsTest do
     skills: %{"vox" => 1, "piano" => " "},
     address: " ",
     keywords: [one: 1, two: ["  "]],
-    birthday: ~D[2017-01-01]
+    birthday: ~D[2017-01-01],
+    human: "false"
   }
 
   describe "fetch param" do
@@ -163,6 +164,14 @@ defmodule Filterable.ParamsTest do
     test "value not nil" do
       {:ok, value} = filter_value(@params, param: :name, default: "cool")
       assert value == "Tom"
+    end
+
+    test "value false" do
+      {:ok, value} = filter_value(@params, param: :human, default: "cool", cast: :boolean)
+      assert value == false
+
+      {:ok, value} = filter_value(@params, param: :human, default: ["test"], cast: :boolean)
+      assert value == false
     end
 
     test "value nil" do

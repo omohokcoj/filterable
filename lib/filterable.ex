@@ -1,4 +1,12 @@
 defmodule Filterable do
+  @moduledoc """
+  `Filterable` allows to map incoming parameters to filter functions.
+
+  This module contains common functions (`apply_filters/3`, `filter_values/2`)
+  which allow to run filters in simple functional Elixir way and `filterable`
+  macro which allows to build filters using DSL (see `Filterable.DSL`)
+  """
+
   alias Filterable.{Params, Utils}
 
   @default_options [allow_blank: false, allow_nil: false, trim: true, default: nil, cast: nil, cast_errors: true]
