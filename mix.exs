@@ -3,7 +3,7 @@ defmodule Filterable.Mixfile do
 
   @name "Filterable"
   @project_url "https://github.com/omohokcoj/filterable"
-  @version "0.5.1"
+  @version "0.5.2"
 
   def project do
     [app: :filterable,

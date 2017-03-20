@@ -7,8 +7,8 @@ defmodule Filterable.Params do
          value        <- fetch_value(params, Keyword.get(opts, :param)),
          value        <- normalize_map(value),
          value        <- trim_value(value, Keyword.get(opts, :trim)),
-         {:ok, value} <- cast_value(value, Keyword.get(opts, :cast), Keyword.get(opts, :cast_errors)),
          value        <- nilify_value(value, Keyword.get(opts, :allow_blank)),
+         {:ok, value} <- cast_value(value, Keyword.get(opts, :cast), Keyword.get(opts, :cast_errors)),
          value        <- default_value(value, Keyword.get(opts, :default)),
      do: {:ok, value}
   end

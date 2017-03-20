@@ -239,6 +239,10 @@ defmodule Filterable.ParamsTest do
         filter_value(@params, param: :keywords, trim: true, cast: &Filterable.Cast.date/1, cast_errors: true)
     end
 
+    test "doesn't return error if unable to cast blank value" do
+      assert {:ok, nil} = filter_value(@params, param: :address, trim: true, cast: :integer, cast_errors: true)
+    end
+
     test "returns error if unable to cast with list" do
       assert {:error, "Unable to cast ~D[2017-01-01] to integer"} =
         filter_value(@params, param: :birthday, cast: [:integer], cast_errors: true)
