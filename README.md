@@ -7,8 +7,8 @@
 [![Hex.pm](https://img.shields.io/hexpm/v/filterable.svg)](https://hex.pm/packages/filterable)
 
 Filterable allows to map incoming query parameters to filter functions.
-The goal is to provide minimal and easy to use DSL for building filters using pure Elixir.
-Filterable doesn't depend on external libraries or frameworks and can be used both in Phoenix and pure Elixir projects.
+The goal is to provide minimal and easy to use DSL for building composable queries using incoming parameters.
+Filterable doesn't depend on external libraries or frameworks and can be used in Phoenix or pure Elixir projects.
 Inspired by [has_scope](https://github.com/plataformatec/has_scope).
 
 ## Installation
@@ -25,7 +25,7 @@ Add `filterable` to your mix.exs.
 
 Put `use Filterable.Phoenix.Controller` inside Phoenix controller or add it to `web.ex`.
 It will extend controller module with `filterable` macro which allows to define filters.
-Then use `apply_filters` macro inside controller action to filter using defined filters:
+Then use `apply_filters` function inside controller action to filter using defined filters:
 
 ```elixir
 defmodule MyApp.PostController do
@@ -57,7 +57,7 @@ defmodule MyApp.PostController do
 end
 ```
 
-If you prefer to handle exceptions then use `apply_filters!`:
+If you prefer to handle errors with exceptions then use `apply_filters!`:
 
 ```elixir
 def index(conn, params) do
@@ -87,7 +87,7 @@ defmodule MyApp.Post do
 end
 ```
 
-Then call `apply_filters` from model module to filter using defined filters:
+Then call `apply_filters` function from model module:
 
 ```elixir
 # /posts?author=Tom
@@ -143,7 +143,7 @@ end
 Each defined filter can be tuned with `@options` module attribute.
 Just set `@options` attribute before filter definition. Available options are:
 
-- `:param` - allows to set query parameter name, by default same as filter name. Accepts `Atom`, `List`, and `Keyword` values:
+`:param` - allows to set query parameter name, by default same as filter name. Accepts `Atom`, `List`, and `Keyword` values:
 
 ```elixir
 # /posts?q=castle
@@ -168,7 +168,7 @@ filter search(query, %{field: field, order: order}, _conn) do
 end
 ```
 
-- `:default` - allows to set default filter value:
+`:default` - allows to set default filter value:
 
 ```elixir
 # /posts
@@ -186,7 +186,7 @@ filter search(query, %{sort: field, order: order}, _conn) do
 end
 ```
 
-- `:allow_blank` - allows to filter using blank values like `""`, `[]`, `{}`, `%{}`. It's `false` by default, so all blank values will be converted to `nil`:
+`:allow_blank` - when `true` then it allows to trigger filter with blank value (`""`, `[]`, `{}`, `%{}`). `false` by default, so all blank values will be converted to `nil`:
 
 ```elixir
 # /posts?title=""
@@ -204,7 +204,7 @@ filter title(query, value, _conn) do
 end
 ```
 
-- `:allow_nil` - allows to trigger filter with `nil` value:
+`:allow_nil` - when `true` then it allows to trigger filter with `nil` value, `false` by default:
 
 ```elixir
 # /posts?title=""
@@ -220,7 +220,7 @@ filter title(query, value, _conn) do
 end
 ```
 
-- `:trim` - allows to remove leading and trailing whitespaces from string values, `true` by default:
+`:trim` - allows to remove leading and trailing whitespaces from string values, `true` by default:
 
 ```elixir
 # /posts?title="   Casle  "
@@ -237,7 +237,7 @@ filter title(query, value, _conn) do
 end
 ```
 
-- `:cast` - allows to convert value to specific type. Available types are: `integer`, `float`, `string`, `atom`, `boolean`, `date`, `datetime`. Also can accept pointer to function:
+`:cast` - allows to convert value to specific type. Available types are: `integer`, `float`, `string`, `atom`, `boolean`, `date`, `datetime`. Also can accept pointer to function:
 
 ```elixir
 # /posts?limit=20
@@ -255,7 +255,7 @@ filter title(query, value, _conn) do
 end
 ```
 
-- `:cast_errors` - allows to avoid cast errors by skipping specific filter:
+`:cast_errors` - accepts `true` (default) or `false`. If `true` then it returns error if value can't be caster to specific type. If `false` - it skips filter if filter value can't be casted:
 
 ```elixir
 # /posts?inserted_at=Casle
@@ -273,7 +273,7 @@ filter inserted_at(query, value, _conn) do
 end
 ```
 
-- `:share` - allows to remove shared value from filter context:
+`:share` - allows to set shared value. When `false` then filter function will be triggered without shared value argument:
 
 ```elixir
 @options share: false
@@ -282,11 +282,11 @@ filter title(query, value) do
 end
 ```
 
-All these options also could be set with `apply_filters` function or `filterable` macro. Then they affect all defined filters:
+All these options can be specified in `apply_filters` function or `filterable` macro. Then they will take affect on all defined filters:
 
 ```elixir
 filterable share: false, cast_errors: false do
-  ...
+  field :title
 end
 
 # or
@@ -302,7 +302,7 @@ filterable PostFilters, share: false, cast_errors: false
 
 `Filterable.Phoenix.Helpers` module provides macros which allows to define some popular filters:
 
-- `field/2` - macro which expands to simple `Ecto.Query.where` filter:
+`field/2` - expands to simple `Ecto.Query.where` filter:
 
 ```elixir
 filterable do
@@ -326,7 +326,7 @@ filterable do
 end
 ```
 
-- `paginateable/1` - provides pagination logic, Default amount of records per page could be tuned with `per_page` option. By default it's set to 20:
+`paginateable/1` - provides pagination logic, Default amount of records per page could be tuned with `per_page` option. By default it's set to 20:
 
 ```elixir
 filterable do
@@ -336,7 +336,7 @@ filterable do
 end
 ```
 
-- `limitable/1` - provides limit/offset logic:
+`limitable/1` - provides limit/offset logic:
 
 ```elixir
 filterable do
@@ -346,7 +346,7 @@ filterable do
 end
 ```
 
-- `orderable/1` - provides sorting logic, accepts list of atoms:
+`orderable/1` - provides sorting logic, accepts list of atoms:
 
 ```elixir
 filterable do
@@ -389,11 +389,12 @@ repos = [%{name: "phoenix", stars: 8565}, %{name: "ecto", start: 2349}]
 ## Similar packages:
 - [filterex](https://github.com/rcdilorenzo/filtrex)
 - [rumage_ecto](https://github.com/Excipients/rummage_ecto)
+- [inquisitor](https://github.com/DockYard/inquisitor)
 
 ## TODO:
 
 - [X] Coverage 100%
-- [ ] Better README
+- [X] Better README
 - [ ] Documentation
 - [X] Improve tests
 

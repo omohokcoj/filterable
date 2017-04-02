@@ -14,7 +14,7 @@ defmodule Filterable.Utils do
   def to_atoms_map(value) do
     if is_map(value) || Keyword.keyword?(value) do
       Enum.into value, %{}, fn ({k, v}) ->
-        {is_bitstring(k) && String.to_atom(k) || k, to_atoms_map(v)}
+        {ensure_atom(k), to_atoms_map(v)}
       end
     else
       value
