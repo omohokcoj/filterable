@@ -390,6 +390,7 @@ repos = [%{name: "phoenix", stars: 8565}, %{name: "ecto", start: 2349}]
 - [filterex](https://github.com/rcdilorenzo/filtrex)
 - [rumage_ecto](https://github.com/Excipients/rummage_ecto)
 - [inquisitor](https://github.com/DockYard/inquisitor)
+- [ex_sieve](https://github.com/valyukov/ex_sieve)
 
 ## TODO:
 
