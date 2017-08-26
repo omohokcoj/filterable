@@ -23,7 +23,7 @@ Add `filterable` to your mix.exs.
 
 ### Phoenix controller
 
-Put `use Filterable.Phoenix.Controller` inside Phoenix controller or add it to `web.ex`.
+Put `use Filterable.Phoenix.Controller` inside Phoenix controller or add it into `web.ex`.
 It will extend controller module with `filterable` macro which allows to define filters.
 Then use `apply_filters` function inside controller action to filter using defined filters:
 
@@ -39,7 +39,7 @@ defmodule MyApp.PostController do
 
     @options param: :q
     filter search(query, value, _conn) do
-      query |> where([u], ilike(u.title, "%#{value}%"))
+      query |> where([u], ilike(u.title, ^"%#{value}%"))
     end
 
     @options cast: :integer
@@ -114,7 +114,7 @@ defmodule PostFilters do
 
   @options param: :q
   filter search(query, value, _conn) do
-    query |> where([u], ilike(u.title, "%#{value}%"))
+    query |> where([u], ilike(u.title, ^"%#{value}%"))
   end
 
   @options cast: :integer
@@ -396,8 +396,10 @@ repos = [%{name: "phoenix", stars: 8565}, %{name: "ecto", start: 2349}]
 
 - [X] Coverage 100%
 - [X] Better README
-- [ ] Documentation
 - [X] Improve tests
+- [X] Better README
+- [ ] Documentation
+- [ ] Dialyzer!!!
 
 ## Contribution
 
