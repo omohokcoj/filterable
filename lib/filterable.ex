@@ -62,6 +62,7 @@ defmodule Filterable do
     end
   end
 
+  @spec apply_filters!(any, map | Keyword.t, module, Keyword.t) :: any | no_return
   def apply_filters!(queryable, params, module, opts \\ []) do
     case apply_filters(queryable, params, module, opts) do
       {:ok, result, values} -> {result, values}
@@ -69,12 +70,14 @@ defmodule Filterable do
     end
   end
 
+  @spec apply_filters(any, map | Keyword.t, module, Keyword.t) :: {:ok, any, map} | {:error, String.t}
   def apply_filters(queryable, params, module, opts \\ []) do
     with {:ok, values} <- filter_values(params, module, opts),
          {:ok, result} <- filters_result(queryable, values, module, opts),
      do: {:ok, result, values}
   end
 
+  @spec filter_values(map | Keyword.t, module, Keyword.t) :: {:ok, map} | {:error, String.t}
   def filter_values(params, module, opts \\ []) do
     Utils.reduce_with module.defined_filters, %{}, fn ({filter_name, filter_opts}, acc) ->
       options =

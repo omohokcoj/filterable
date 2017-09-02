@@ -1,6 +1,7 @@
 defmodule Filterable.Params do
   alias Filterable.Utils
 
+  @spec filter_value(map | Keyword.t, Keyword.t) :: {:ok | :error, any}
   def filter_value(params, opts \\ []) do
     with params       <- Utils.to_atoms_map(params),
          params       <- fetch_params(params, Keyword.get(opts, :top_param)),

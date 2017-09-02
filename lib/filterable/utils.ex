@@ -1,4 +1,5 @@
 defmodule Filterable.Utils do
+  @spec reduce_with(Enum.t, any, (Enum.element, any -> {:cont, {:ok, any}} | {:halt, any})) :: any
   def reduce_with(enumerable, acc, fun) do
     Enum.reduce_while enumerable, {:ok, acc}, fn (val, {:ok, acc}) ->
       case fun.(val, acc) do
@@ -9,6 +10,7 @@ defmodule Filterable.Utils do
     end
   end
 
+  @spec to_atoms_map(list | map) :: map
   def to_atoms_map([]), do: []
   def to_atoms_map(%{__struct__: _} = value), do: value
   def to_atoms_map(value) do
@@ -24,6 +26,7 @@ defmodule Filterable.Utils do
   def presence(value) when value in ["", [], {}, %{}], do: nil
   def presence(value), do: value
 
+  @spec ensure_atom(String.t | atom) :: atom
   def ensure_atom(value) when is_bitstring(value), do: String.to_atom(value)
   def ensure_atom(value) when is_atom(value), do: value
 end

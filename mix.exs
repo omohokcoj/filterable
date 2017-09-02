@@ -3,7 +3,7 @@ defmodule Filterable.Mixfile do
 
   @name "Filterable"
   @project_url "https://github.com/omohokcoj/filterable"
-  @version "0.5.2"
+  @version "0.5.3"
 
   def project do
     [app: :filterable,
@@ -36,7 +36,8 @@ defmodule Filterable.Mixfile do
      {:plug, "~> 1.1.2", only: :test},
      {:postgrex, ">= 0.0.0", only: :test},
      {:ecto, "~> 2.1", only: :test},
-     {:inch_ex, only: [:dev, :docs]}]
+     {:inch_ex, only: [:dev, :docs]},
+     {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false}]
   end
 
   defp description do
@@ -72,6 +73,6 @@ defmodule Filterable.Mixfile do
     ["ecto.seed": "run priv/repo/seeds.exs",
      "ecto.setup": ["ecto.create", "ecto.migrate", "ecto.seed"],
      "ecto.reset": ["ecto.drop", "ecto.setup"],
-     "test": ["ecto.create --quiet", "ecto.migrate", "test"]]
+     "test": ["ecto.reset", "test"]]
   end
 end

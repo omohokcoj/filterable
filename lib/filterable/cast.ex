@@ -1,4 +1,5 @@
 defmodule Filterable.Cast do
+  @spec integer(String.t | number) :: integer | :error
   def integer(value) when is_bitstring(value) do
     case Integer.parse(value) do
       :error   -> :error
@@ -15,6 +16,7 @@ defmodule Filterable.Cast do
     :error
   end
 
+  @spec float(String.t | number) :: float | :error
   def float(value) when is_bitstring(value) do
     case Float.parse(value) do
       :error   -> :error
@@ -31,6 +33,7 @@ defmodule Filterable.Cast do
     :error
   end
 
+  @spec boolean(String.t | boolean) :: boolean | :error
   def boolean(value) when is_bitstring(value) do
     cond do
       value in ["true", "t"]  -> true
@@ -45,13 +48,15 @@ defmodule Filterable.Cast do
     :error
   end
 
+  @spec string(any) :: String.t
   def string(value) when is_bitstring(value) do
     value
   end
   def string(value) do
-    Kernel.to_string(value)
+    to_string(value)
   end
 
+  @spec atom(String.t | atom) :: atom | :error
   def atom(value) when is_bitstring(value) do
     String.to_atom(value)
   end
@@ -62,6 +67,7 @@ defmodule Filterable.Cast do
     :error
   end
 
+  @spec date(String.t | Date.t) :: Date.t | :error
   def date(value) when is_bitstring(value) do
     case Date.from_iso8601(value) do
       {:ok, val}  -> val
@@ -75,6 +81,7 @@ defmodule Filterable.Cast do
     :error
   end
 
+  @spec datetime(String.t | NaiveDateTime.t) :: NaiveDateTime.t | :error
   def datetime(value) when is_bitstring(value) do
     case NaiveDateTime.from_iso8601(value) do
       {:ok, val}  -> val

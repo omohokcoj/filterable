@@ -399,7 +399,7 @@ repos = [%{name: "phoenix", stars: 8565}, %{name: "ecto", start: 2349}]
 - [X] Improve tests
 - [X] Better README
 - [ ] Documentation
-- [ ] Dialyzer!!!
+- [X] Dialyzer!!!
 
 ## Contribution
 
