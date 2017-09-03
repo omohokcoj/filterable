@@ -36,7 +36,7 @@ defmodule Filterable.Mixfile do
      {:plug, "~> 1.1.2", only: :test},
      {:postgrex, ">= 0.0.0", only: :test},
      {:ecto, "~> 2.1", only: :test},
-     {:inch_ex, only: [:dev, :docs]},
+     {:inch_ex, ">= 0.0.0", only: [:dev, :docs]},
      {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false}]
   end
 
@@ -59,7 +59,7 @@ defmodule Filterable.Mixfile do
   defp applications(_), do: applications()
   defp applications(), do: ~w(logger)a
 
-  defp elixirc_paths(:test), do: elixirc_paths() ++ ~w(test/support/repo.ex)
+  defp elixirc_paths(:test), do: elixirc_paths() ++ ~w(test/support)
   defp elixirc_paths(_), do: elixirc_paths()
   defp elixirc_paths(), do: ~w(lib)
 

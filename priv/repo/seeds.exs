@@ -1,4 +1,4 @@
-Filterable.Repo.start_link()
+Code.load_file("test/fixtures/users.ex")
 
-Filterable.Repo
-|> Ecto.Adapters.SQL.query!("\copy users FROM '#{Path.absname("test/fixtures/users.csv")}' WITH CSV HEADER")
+Filterable.Repo.start_link()
+Filterable.Fixtures.Users.seed()

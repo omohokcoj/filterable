@@ -8,6 +8,9 @@ services:
   - postgresql
 env:
   - MIX_ENV=test
+cache:
+  directories:
+    - .dialyzer
 script:
   - mix deps.get
   - mix compile
