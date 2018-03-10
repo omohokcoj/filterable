@@ -50,7 +50,7 @@ defmodule Filterable.Mixfile do
 
   defp description do
     """
-    Allows to map incoming query parameters to filter function with easy to use DSL inspired by Rails has_scope.
+    Filtering from incoming params in Elixir/Ecto/Phoenix with easy to use DSL.
     """
   end
 
