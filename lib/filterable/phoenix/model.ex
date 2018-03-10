@@ -24,8 +24,8 @@ defmodule Filterable.Phoenix.Model do
         end
       end
 
-    Works only for Ecto models in Phoenix app.
-    Use `use Filterable` for Ecto models outside Phoenix app.
+  Works only for Ecto models in Phoenix app.
+  Use `use Filterable` for Ecto models outside Phoenix app.
   """
 
   defmacro __using__(_) do
