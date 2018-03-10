@@ -9,7 +9,6 @@ defmodule Filterable.Repo.Migrations.CreateUsers do
       add :street_address, :string
       add :city,           :string
       add :state,          :string
-      add :zip_code,       :integer
       add :country,        :string
       add :phone,          :string
       add :birthday,       :date

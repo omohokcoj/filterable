@@ -5,14 +5,31 @@ defmodule Filterable.Phoenix.ModelTest do
 
   test "filters using module function" do
     params = Plug.Conn.Query.decode("name=Martin&age=22")
-    {:ok, query, values} = Filterable.apply_filters(User, params, Filterable.UserFilters, share: [])
+
+    {:ok, query, values} =
+      Filterable.apply_filters(User, params, Filterable.UserFilters, share: [])
+
     assert Repo.one(query).name == "Martin"
-    assert values == %{name: "Martin", age: 22, paginate: %{page: 1, per_page: 4}, sort: %{order: :desc, sort: nil}}
+
+    assert values == %{
+             name: "Martin",
+             age: 22,
+             paginate: %{page: 1, per_page: 4},
+             sort: %{order: :desc, sort: nil}
+           }
 
     params = Plug.Conn.Query.decode("name=    &age=190")
-    {:ok, query, values} = Filterable.apply_filters(User, params, Filterable.UserFilters, share: [])
+
+    {:ok, query, values} =
+      Filterable.apply_filters(User, params, Filterable.UserFilters, share: [])
+
     assert length(Repo.all(query)) == 4
-    assert values == %{age: 190, paginate: %{page: 1, per_page: 4}, sort: %{order: :desc, sort: nil}}
+
+    assert values == %{
+             age: 190,
+             paginate: %{page: 1, per_page: 4},
+             sort: %{order: :desc, sort: nil}
+           }
   end
 
   test "filters using macro" do

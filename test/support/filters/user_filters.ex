@@ -1,6 +1,8 @@
 defmodule Filterable.UserFilters do
+  @moduledoc false
+
   use Filterable.DSL
-  use Filterable.Phoenix.Helpers
+  use Filterable.Ecto.Helpers
 
   import Ecto.Query
 
@@ -20,8 +22,11 @@ defmodule Filterable.UserFilters do
 
   @options cast: :integer
   filter position(query, %{lat: lat, lng: lng}, _) do
-    from q in query,
-      where: fragment("round(?[1]) = ?", q.latlng, ^lat)
-         and fragment("round(?[2]) = ?", q.latlng, ^lng)
+    from(
+      q in query,
+      where:
+        fragment("round(?[1]) = ?", q.latlng, ^lat) and
+          fragment("round(?[2]) = ?", q.latlng, ^lng)
+    )
   end
 end

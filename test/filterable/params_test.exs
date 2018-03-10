@@ -54,7 +54,9 @@ defmodule Filterable.ParamsTest do
       {:ok, value} = filter_value(@params, param: [skills: [piano: [:other]]])
       assert value == %{piano: %{other: nil}}
 
-      {:ok, value} = filter_value(@params, param: [skills: [piano: [:other]], other: [:test, :test2]])
+      {:ok, value} =
+        filter_value(@params, param: [skills: [piano: [:other]], other: [:test, :test2]])
+
       assert value == %{other: nil, skills: %{piano: %{other: nil}}}
     end
   end
@@ -183,7 +185,9 @@ defmodule Filterable.ParamsTest do
       {:ok, value} = filter_value(@params, param: :skills, trim: true, default: [vox: "test"])
       assert value == %{vox: 1, piano: nil}
 
-      {:ok, value} = filter_value(@params, param: :keywords, trim: true, default: [one: "not one"])
+      {:ok, value} =
+        filter_value(@params, param: :keywords, trim: true, default: [one: "not one"])
+
       assert value == %{one: 1, two: nil}
     end
 
@@ -203,7 +207,9 @@ defmodule Filterable.ParamsTest do
     end
 
     test "using list of functions" do
-      {:ok, value} = filter_value(@params, param: :name, cast: [&String.downcase/1, &String.to_atom/1])
+      {:ok, value} =
+        filter_value(@params, param: :name, cast: [&String.downcase/1, &String.to_atom/1])
+
       assert value == :tom
     end
 
@@ -211,7 +217,9 @@ defmodule Filterable.ParamsTest do
       {:ok, value} = filter_value(@params, param: :keywords, trim: true, cast: :string)
       assert value == %{one: "1", two: nil}
 
-      {:ok, value} = filter_value(@params, param: :friends, trim: true, cast: :integer, allow_blank: true)
+      {:ok, value} =
+        filter_value(@params, param: :friends, trim: true, cast: :integer, allow_blank: true)
+
       assert value == []
     end
 
@@ -234,31 +242,54 @@ defmodule Filterable.ParamsTest do
     end
 
     test "returns error if unable to cast" do
-      assert {:error, "Unable to cast 1 to date"} = filter_value(@params, param: :keywords, trim: true, cast: :date, cast_errors: true)
+      assert {:error, "Unable to cast 1 to date"} =
+               filter_value(@params, param: :keywords, trim: true, cast: :date, cast_errors: true)
+
       assert {:error, "Unable to cast 1 using &Filterable.Cast.date/1"} =
-        filter_value(@params, param: :keywords, trim: true, cast: &Filterable.Cast.date/1, cast_errors: true)
+               filter_value(
+                 @params,
+                 param: :keywords,
+                 trim: true,
+                 cast: &Filterable.Cast.date/1,
+                 cast_errors: true
+               )
     end
 
     test "doesn't return error if unable to cast blank value" do
-      assert {:ok, nil} = filter_value(@params, param: :address, trim: true, cast: :integer, cast_errors: true)
+      assert {:ok, nil} =
+               filter_value(
+                 @params,
+                 param: :address,
+                 trim: true,
+                 cast: :integer,
+                 cast_errors: true
+               )
     end
 
     test "returns error if unable to cast with list" do
       assert {:error, "Unable to cast ~D[2017-01-01] to integer"} =
-        filter_value(@params, param: :birthday, cast: [:integer], cast_errors: true)
+               filter_value(@params, param: :birthday, cast: [:integer], cast_errors: true)
     end
 
     test "returns custom error message" do
       assert {:error, :invalid_format} =
-        filter_value(@params, param: :friends, trim: true, cast: &NaiveDateTime.from_iso8601/1, cast_errors: true)
+               filter_value(
+                 @params,
+                 param: :friends,
+                 trim: true,
+                 cast: &NaiveDateTime.from_iso8601/1,
+                 cast_errors: true
+               )
     end
 
     test "returns original list value" do
-      assert {:ok, ["Jonny "]} = filter_value(@params, param: :friends, cast: [:string], cast_errors: true)
+      assert {:ok, ["Jonny "]} =
+               filter_value(@params, param: :friends, cast: [:string], cast_errors: true)
     end
 
     test "returns :ok if cast_errors false" do
-      assert {:ok, nil} = filter_value(@params, param: :birthday, cast: [:integer], cast_errors: false)
+      assert {:ok, nil} =
+               filter_value(@params, param: :birthday, cast: [:integer], cast_errors: false)
     end
   end
 end

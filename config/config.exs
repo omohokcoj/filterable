@@ -29,6 +29,6 @@ use Mix.Config
 #
 config :filterable, ecto_repos: [Filterable.Repo]
 
-if Mix.env == :test do
+if Mix.env() == :test do
   import_config "test.exs"
 end

@@ -44,7 +44,7 @@ defmodule MyApp.PostController do
 
     @options cast: :integer
     filter year(query, value, _conn) do
-      query |> where(author_name: ^value)
+      query |> where(year: ^value)
     end
   end
 
@@ -105,7 +105,7 @@ Filters could be defined in separate module, just `use Filterable.DSL` inside mo
 ```elixir
 defmodule PostFilters do
   use Filterable.DSL
-  use Filterable.Phoenix.Helpers
+  use Filterable.Ecto.Helpers
 
   field :author
   field :title
@@ -173,7 +173,7 @@ end
 ```elixir
 # /posts
 # => #Ecto.Query<from p in Post, limit: 20>
-@options default: 20, cast: integer
+@options default: 20, cast: :integer
 filter limit(query, value, _conn) do
   query |> limit(^value)
 end
@@ -298,9 +298,9 @@ filterable PostFilters, share: false, cast_errors: false
 {:ok, query, filter_values} = apply_filters(conn, share: false, cast_errors: false)
 ```
 
-## Phoenix helpers
+## Ecto helpers
 
-`Filterable.Phoenix.Helpers` module provides macros which allows to define some popular filters:
+`Filterable.Ecto.Helpers` module provides macros which allows to define some popular filters:
 
 `field/2` - expands to simple `Ecto.Query.where` filter:
 
@@ -386,20 +386,23 @@ repos = [%{name: "phoenix", stars: 8565}, %{name: "ecto", start: 2349}]
 {:ok, result, filter_values} = Filterable.apply_filters(repos, %{name: "phoenix", stars: "8000"}, RepoFilters)
 ```
 
-## Similar packages:
+## Code formatter
+`filter` macro and phoenix helpers like `orderable`, `paginateable` are the part fo DSL so there is no need to wrap them in parentheses.
+
+Just add the following line into formatter configs:
+```elixir
+[
+  # ...
+
+  import_deps: [:filterable]
+]
+```
+
+## Similar packages
 - [filterex](https://github.com/rcdilorenzo/filtrex)
 - [rumage_ecto](https://github.com/Excipients/rummage_ecto)
 - [inquisitor](https://github.com/DockYard/inquisitor)
 - [ex_sieve](https://github.com/valyukov/ex_sieve)
-
-## TODO:
-
-- [X] Coverage 100%
-- [X] Better README
-- [X] Improve tests
-- [X] Better README
-- [ ] Documentation
-- [X] Dialyzer!!!
 
 ## Contribution
 

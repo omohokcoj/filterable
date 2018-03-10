@@ -4,7 +4,7 @@ defmodule FilterableTest do
 
   alias Filterable.{User, Repo}
 
-  filterable Filterable.UserFilters, share: %{}
+  filterable(Filterable.UserFilters, share: %{})
 
   describe "birthday" do
     test "returns user with birthday" do

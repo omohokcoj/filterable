@@ -1,4 +1,23 @@
-defmodule Filterable.Phoenix.Helpers do
+defmodule Filterable.Ecto.Helpers do
+  @moduledoc ~S"""
+  Contains macros which allow to define widely used filters.
+
+      use Filterable.Ecto.Helpers
+
+  Example:
+
+      defmodule PostFilters do
+        use Filterable.DSL
+        use Filterable.Ecto.Helpers
+
+        field :author
+        field :title
+
+        paginateable per_page: 10
+        orderable [:title, :inserted_at]
+      end
+  """
+
   defmacro __using__(_) do
     quote do
       import unquote(__MODULE__)
@@ -20,18 +39,22 @@ defmodule Filterable.Phoenix.Helpers do
     quote do
       @options param: [:page, :per_page],
                default: [page: 1, per_page: unquote(per_page)],
-               cast: :integer, share: false
+               cast: :integer,
+               share: false
       filter paginate(_, %{page: page, per_page: _}) when page < 0 do
         {:error, "page can't be negative"}
       end
+
       filter paginate(_, %{page: _page, per_page: per_page}) when per_page < 0 do
         {:error, "per_page can't be negative"}
       end
+
       filter paginate(_, %{page: _page, per_page: per_page}) when per_page > unquote(per_page) do
         {:error, "per_page can't be more than #{unquote(per_page)}"}
       end
+
       filter paginate(query, %{page: page, per_page: per_page}) do
-        Ecto.Query.from q in query, limit: ^per_page, offset: ^((page - 1) * per_page)
+        Ecto.Query.from(q in query, limit: ^per_page, offset: ^((page - 1) * per_page))
       end
     end
   end
@@ -42,12 +65,15 @@ defmodule Filterable.Phoenix.Helpers do
       filter sort(query, %{sort: nil, order: _}) do
         query
       end
-      filter sort(_, %{sort: field, order: _}) when not field in unquote(fields) do
+
+      filter sort(_, %{sort: field, order: _}) when not (field in unquote(fields)) do
         {:error, "Unable to sort on #{inspect(field)}, only name and surname allowed"}
       end
-      filter sort(_, %{sort: _, order: order}) when not order in ~w(asc desc)a do
+
+      filter sort(_, %{sort: _, order: order}) when not (order in ~w(asc desc)a) do
         {:error, "Unable to sort using #{inspect(order)}, only 'asc' and 'desc' allowed"}
       end
+
       filter sort(query, %{sort: field, order: order}) do
         query |> Ecto.Query.order_by([{^order, ^field}])
       end
@@ -62,9 +88,11 @@ defmodule Filterable.Phoenix.Helpers do
       filter limit(_, value) when value < 0 do
         {:error, "limit can't be negative"}
       end
+
       filter limit(_, value) when value > unquote(limit) do
         {:error, "limit can't be more than #{unquote(limit)}"}
       end
+
       filter limit(query, value) do
         query |> Ecto.Query.limit(^value)
       end
@@ -73,6 +101,7 @@ defmodule Filterable.Phoenix.Helpers do
       filter offset(_, value) when value < 0 do
         {:error, "offset can't be negative"}
       end
+
       filter offset(query, value) do
         query |> Ecto.Query.offset(^value)
       end

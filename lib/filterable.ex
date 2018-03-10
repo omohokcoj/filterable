@@ -2,14 +2,21 @@ defmodule Filterable do
   @moduledoc """
   `Filterable` allows to map incoming parameters to filter functions.
 
-  This module contains common functions (`apply_filters/3`, `filter_values/2`)
-  which allow to run filters in simple functional Elixir way and `filterable`
-  macro which allows to build filters using DSL (see `Filterable.DSL`)
+  This module contains functions (`apply_filters/3`, `filter_values/2`)
+  which allow to perform filtering and `filterable` macro which allows
+  to define available filters using DSL (see `Filterable.DSL`).
   """
 
   alias Filterable.{Params, Utils}
 
-  @default_options [allow_blank: false, allow_nil: false, trim: true, default: nil, cast: nil, cast_errors: true]
+  @default_options [
+    allow_blank: false,
+    allow_nil: false,
+    trim: true,
+    default: nil,
+    cast: nil,
+    cast_errors: true
+  ]
 
   defmacro __using__(_) do
     quote do
@@ -39,47 +46,50 @@ defmodule Filterable do
         Keyword.merge(opts, @filter_options)
       end
 
-      defoverridable [apply_filters!: 3, apply_filters!: 2, apply_filters: 3, apply_filters: 2,
-                      filter_values: 2, filter_values: 1, filter_options: 1]
+      defoverridable apply_filters!: 3,
+                     apply_filters!: 2,
+                     apply_filters: 3,
+                     apply_filters: 2,
+                     filter_values: 2,
+                     filter_values: 1,
+                     filter_options: 1
     end
   end
 
   defmacro filterable(arg, opts \\ [])
-  defmacro filterable([do: block], opts),
-    do: filterable(nil, block, opts)
-  defmacro filterable(arg, do: block),
-    do: filterable(nil, block, arg)
-  defmacro filterable(arg, opts),
-    do: filterable(arg, nil, opts)
+  defmacro filterable([do: block], opts), do: filterable(nil, block, opts)
+  defmacro filterable(arg, do: block), do: filterable(nil, block, arg)
+  defmacro filterable(arg, opts), do: filterable(arg, nil, opts)
 
   defmacro define_module(module, do: block) do
     quote do
       defmodule unquote(module) do
         use Filterable.DSL
-        use Filterable.Phoenix.Helpers
+        use Filterable.Ecto.Helpers
         unquote(block)
       end
     end
   end
 
-  @spec apply_filters!(any, map | Keyword.t, module, Keyword.t) :: any | no_return
+  @spec apply_filters!(any, map | Keyword.t(), module, Keyword.t()) :: any | no_return
   def apply_filters!(queryable, params, module, opts \\ []) do
     case apply_filters(queryable, params, module, opts) do
       {:ok, result, values} -> {result, values}
-      {:error, message}     -> raise Filterable.FilterError, message
+      {:error, message} -> raise Filterable.FilterError, message
     end
   end
 
-  @spec apply_filters(any, map | Keyword.t, module, Keyword.t) :: {:ok, any, map} | {:error, String.t}
+  @spec apply_filters(any, map | Keyword.t(), module, Keyword.t()) ::
+          {:ok, any, map} | {:error, String.t()}
   def apply_filters(queryable, params, module, opts \\ []) do
     with {:ok, values} <- filter_values(params, module, opts),
          {:ok, result} <- filters_result(queryable, values, module, opts),
-     do: {:ok, result, values}
+         do: {:ok, result, values}
   end
 
-  @spec filter_values(map | Keyword.t, module, Keyword.t) :: {:ok, map} | {:error, String.t}
+  @spec filter_values(map | Keyword.t(), module, Keyword.t()) :: {:ok, map} | {:error, String.t()}
   def filter_values(params, module, opts \\ []) do
-    Utils.reduce_with module.defined_filters, %{}, fn ({filter_name, filter_opts}, acc) ->
+    Utils.reduce_with(module.defined_filters, %{}, fn {filter_name, filter_opts}, acc ->
       options =
         [param: filter_name]
         |> Keyword.merge(@default_options)
@@ -87,33 +97,36 @@ defmodule Filterable do
         |> Keyword.merge(opts)
 
       case Params.filter_value(params, options) do
-        {:ok, nil}          -> acc
-        {:ok, val}          -> Map.put(acc, filter_name, val)
+        {:ok, nil} -> acc
+        {:ok, val} -> Map.put(acc, filter_name, val)
         error = {:error, _} -> error
       end
-    end
+    end)
   end
 
   defp filters_result(queryable, filter_values, module, opts) do
-    Utils.reduce_with module.defined_filters, queryable, fn ({filter_name, filter_opts}, queryable) ->
+    Utils.reduce_with(module.defined_filters, queryable, fn {filter_name, filter_opts}, queryable ->
       options = Keyword.merge(opts, filter_opts)
-      value   = Map.get(filter_values, filter_name)
+      value = Map.get(filter_values, filter_name)
 
-      share     = Keyword.get(options, :share)
+      share = Keyword.get(options, :share)
       allow_nil = Keyword.get(options, :allow_nil)
 
       try do
         cond do
           (allow_nil || value) && share ->
             apply(module, filter_name, [queryable, value, share])
+
           allow_nil || value ->
             apply(module, filter_name, [queryable, value])
-          true -> queryable
+
+          true ->
+            queryable
         end
       rescue
         FunctionClauseError -> queryable
       end
-    end
+    end)
   end
 
   defp filterable(module, block, opts) do

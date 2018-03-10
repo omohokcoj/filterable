@@ -1,6 +1,7 @@
 language: elixir
 elixir:
-  - 1.5.1
+  - 1.5.0
+  - 1.6.0
 otp_release:
   - 20.0
 sudo: false
@@ -16,6 +17,8 @@ script:
   - mix compile
   - mix ecto.setup
   - mix dialyzer
+  - mix format --check-formatted --dry-ru
+  - mix credo
   - mix coveralls.travis
 after_script:
   - MIX_ENV=docs mix deps.get

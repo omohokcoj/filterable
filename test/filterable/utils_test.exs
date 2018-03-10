@@ -6,22 +6,22 @@ defmodule Filterable.UtilsTest do
   describe "reduce_with/3" do
     test "returns error tuple" do
       assert {:error, "2 not allowed"} =
-        Utils.reduce_with([1, 2, 3], [], fn (num, acc) ->
-          case num do
-            2 -> {:error, "2 not allowed"}
-            _ -> acc ++ [num]
-          end
-        end)
+               Utils.reduce_with([1, 2, 3], [], fn num, acc ->
+                 case num do
+                   2 -> {:error, "2 not allowed"}
+                   _ -> acc ++ [num]
+                 end
+               end)
     end
 
     test "returns ok tuple" do
       assert {:ok, [1, 2, 3]} =
-        Utils.reduce_with([1, 2, 3], [], fn (num, acc) ->
-          case num do
-            4 -> {:error, "4 not allowed"}
-            _ -> acc ++ [num]
-          end
-        end)
+               Utils.reduce_with([1, 2, 3], [], fn num, acc ->
+                 case num do
+                   4 -> {:error, "4 not allowed"}
+                   _ -> acc ++ [num]
+                 end
+               end)
     end
   end
 

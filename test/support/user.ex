@@ -1,4 +1,6 @@
 defmodule Filterable.User do
+  @moduledoc false
+
   use Ecto.Schema
   use Filterable.Phoenix.Model
 
@@ -16,19 +18,18 @@ defmodule Filterable.User do
   end
 
   schema "users" do
-    field :gender,         :string
-    field :name,           :string
-    field :surname,        :string
+    field :gender, :string
+    field :name, :string
+    field :surname, :string
     field :street_address, :string
-    field :city,           :string
-    field :state,          :string
-    field :zip_code,       :integer
-    field :country,        :string
-    field :phone,          :string
-    field :birthday,       :date
-    field :weight,         :float
-    field :age,            :integer
-    field :latlng,         {:array, :float}
+    field :city, :string
+    field :state, :string
+    field :country, :string
+    field :phone, :string
+    field :birthday, :date
+    field :weight, :float
+    field :age, :integer
+    field :latlng, {:array, :float}
 
     timestamps()
   end

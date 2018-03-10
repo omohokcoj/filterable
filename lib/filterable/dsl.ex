@@ -1,4 +1,8 @@
 defmodule Filterable.DSL do
+  @moduledoc ~S"""
+  Provides DSL for building filters.
+  """
+
   defmacro __using__(_) do
     quote do
       import unquote(__MODULE__)
@@ -26,15 +30,22 @@ defmodule Filterable.DSL do
         Enum.reverse(@filters)
       end
 
-      defoverridable [apply_filters!: 3, apply_filters!: 2, apply_filters: 3,
-                      apply_filters: 2, filter_values: 2, filter_values: 1]
+      defoverridable apply_filters!: 3,
+                     apply_filters!: 2,
+                     apply_filters: 3,
+                     apply_filters: 2,
+                     filter_values: 2,
+                     filter_values: 1
     end
   end
 
-  defmacro filter(head = {:when, _, [{name, _, _} | _]}, do: body),
-    do: define_filter(name, head, body)
-  defmacro filter(head = {name, _, _}, do: body),
-    do: define_filter(name, head, body)
+  defmacro filter(head = {:when, _, [{name, _, _} | _]}, do: body) do
+    define_filter(name, head, body)
+  end
+
+  defmacro filter(head = {name, _, _}, do: body) do
+    define_filter(name, head, body)
+  end
 
   defp define_filter(filter_name, head, body) do
     quote do
