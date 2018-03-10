@@ -16,7 +16,7 @@ Inspired by [has_scope](https://github.com/plataformatec/has_scope).
 Add `filterable` to your mix.exs.
 
 ```elixir
-{:filterable, "~> 0.5.3"}
+{:filterable, "~> 0.6.0"}
 ```
 
 ## Usage
