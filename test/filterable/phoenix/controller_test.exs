@@ -29,7 +29,7 @@ defmodule Filterable.Phoenix.ControllerTest do
              name: "Martin",
              age: 22,
              paginate: %{page: 1, per_page: 4},
-             sort: %{order: :desc, sort: nil}
+             sort: %{order: "desc", sort: nil}
            }
 
     params = Plug.Conn.Query.decode("name=    &age=190")
@@ -42,7 +42,7 @@ defmodule Filterable.Phoenix.ControllerTest do
     assert values == %{
              age: 190,
              paginate: %{page: 1, per_page: 4},
-             sort: %{order: :desc, sort: nil}
+             sort: %{order: "desc", sort: nil}
            }
   end
 

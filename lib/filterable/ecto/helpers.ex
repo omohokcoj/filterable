@@ -60,8 +60,10 @@ defmodule Filterable.Ecto.Helpers do
   end
 
   defmacro orderable(fields) when is_list(fields) do
+    fields = Enum.map(fields, &to_string/1)
+
     quote do
-      @options param: [:sort, :order], default: [order: :desc], cast: :atom, share: false
+      @options param: [:sort, :order], default: [order: "desc"], cast: :string, share: false
       filter sort(query, %{sort: nil, order: _}) do
         query
       end
@@ -70,11 +72,13 @@ defmodule Filterable.Ecto.Helpers do
         {:error, "Unable to sort on #{inspect(field)}, only name and surname allowed"}
       end
 
-      filter sort(_, %{sort: _, order: order}) when not (order in ~w(asc desc)a) do
+      filter sort(_, %{sort: _, order: order}) when not (order in ~w(asc desc)) do
         {:error, "Unable to sort using #{inspect(order)}, only 'asc' and 'desc' allowed"}
       end
 
       filter sort(query, %{sort: field, order: order}) do
+        field = String.to_atom(field)
+        order = String.to_atom(order)
         query |> Ecto.Query.order_by([{^order, ^field}])
       end
     end

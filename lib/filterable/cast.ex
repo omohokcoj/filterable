@@ -70,16 +70,35 @@ defmodule Filterable.Cast do
     to_string(value)
   end
 
-  @spec atom(String.t() | atom) :: atom | :error
-  def atom(value) when is_bitstring(value) do
+  @spec atom(String.t() | atom, List.t(atom)) :: atom | :error
+  def atom(value, checked_values) when is_binary(value) do
+    case Enum.find(checked_values, &(Atom.to_string(&1) == value)) do
+      nil -> :error
+      value -> value
+    end
+  end
+
+  def atom(value, checked_values) when is_atom(value) do
+    case Enum.find(checked_values, &(&1 == value)) do
+      nil -> :error
+      _ -> value
+    end
+  end
+
+  def atom(_, _) do
+    :error
+  end
+
+  @spec atom_unchecked(String.t() | atom) :: atom | :error
+  def atom_unchecked(value) when is_binary(value) do
     String.to_atom(value)
   end
 
-  def atom(value) when is_atom(value) do
+  def atom_unchecked(value) when is_atom(value) do
     value
   end
 
-  def atom(_) do
+  def atom_unchecked(_) do
     :error
   end
 
