@@ -180,7 +180,7 @@ end
 
 # /posts
 # => #Ecto.Query<from p in Post, order_by: [desc: p.inserted_at]>
-@options param: [:sort, :order], default: [sort: :inserted_at, order: :desc], cast: :atom
+@options param: [:sort, :order], default: [sort: :inserted_at, order: :desc], cast: :atom_unchecked
 filter search(query, %{sort: field, order: order}, _conn) do
   query |> order_by([{^order, ^field}])
 end
@@ -237,7 +237,9 @@ filter title(query, value, _conn) do
 end
 ```
 
-`:cast` - allows to convert value to specific type. Available types are: `integer`, `float`, `string`, `atom`, `boolean`, `date`, `datetime`. Also can accept pointer to function:
+`:cast` - allows to convert value to specific type. Available types are: `:integer`, `:float`, `:string`, `{:atom, [...]}`, `:boolean`, `:date`, `:datetime`, `:atom_unchecked`.  Casting to atoms is a special case, as atoms are never garbage collected.  It is therefore important to give a list of valid atoms.  Casting will only work if the given value is in the list of atoms.
+
+Also can accept pointer to function:
 
 ```elixir
 # /posts?limit=20
