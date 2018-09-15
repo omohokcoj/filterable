@@ -54,9 +54,9 @@ defmodule Filterable.DSL do
       Module.delete_attribute(__MODULE__, :options)
 
       if options != nil && Enum.member?(options, {:cast, :atom}) do
-        IO.warn "`cast: :atom` is deprecated for filter '#{to_string(unquote(filter_name))}'.
+        IO.warn("`cast: :atom` is deprecated for filter '#{to_string(unquote(filter_name))}'.
           Consider using `cast: {:atom, [:foo, :bar]}` to check for valid atoms before casting.
-          To cast into an atom without validating the value, use `cast: :atom_unchecked`."
+          To cast into an atom without validating the value, use `cast: :atom_unchecked`.")
       end
 
       def unquote(head), do: unquote(body)

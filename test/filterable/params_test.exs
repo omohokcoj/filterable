@@ -224,13 +224,13 @@ defmodule Filterable.ParamsTest do
     end
 
     test "to atom" do
-      {:ok, value} = filter_value(@params, param: :human, cast: {:atom, [:true, :false]})
-      assert value == :false
+      {:ok, value} = filter_value(@params, param: :human, cast: {:atom, [true, false]})
+      assert value == false
     end
 
     test "to atom unchecked" do
       {:ok, value} = filter_value(@params, param: :name, cast: :atom_unchecked)
-      assert value == :"Tom"
+      assert value == :Tom
     end
 
     test "using wrong cast param" do

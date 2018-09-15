@@ -105,7 +105,8 @@ defmodule Filterable do
   end
 
   defp filters_result(queryable, filter_values, module, opts) do
-    Utils.reduce_with(module.defined_filters, queryable, fn {filter_name, filter_opts}, queryable ->
+    Utils.reduce_with(module.defined_filters, queryable, fn {filter_name, filter_opts},
+                                                            queryable ->
       options = Keyword.merge(opts, filter_opts)
       value = Map.get(filter_values, filter_name)
 
