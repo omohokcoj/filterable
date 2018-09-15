@@ -228,6 +228,11 @@ defmodule Filterable.ParamsTest do
       assert value == false
     end
 
+    test "to atom deprecated" do
+      {:ok, value} = filter_value(@params, param: :human, cast: :atom)
+      assert value == false
+    end
+
     test "to atom unchecked" do
       {:ok, value} = filter_value(@params, param: :name, cast: :atom_unchecked)
       assert value == :Tom
