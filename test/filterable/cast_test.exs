@@ -57,17 +57,39 @@ defmodule Filterable.CastTest do
     end
   end
 
-  describe "atom/1" do
-    test "returns casted value" do
-      assert Cast.atom("string") == :string
+  describe "atom/2" do
+    test "returns the casted string if present in the allowed values" do
+      assert Cast.atom("foo", [:foo, :bar]) == :foo
     end
 
-    test "returns original value" do
-      assert Cast.atom(:atom) == :atom
+    test "returns :error if the string is not present in the allowed values" do
+      assert Cast.atom("toto", [:foo, :bar]) == :error
+    end
+
+    test "returns the given atom if it is present in the allowed values" do
+      assert Cast.atom(:foo, [:foo, :bar]) == :foo
+    end
+
+    test "returns :error if the given atom is not present in the allowed values" do
+      assert Cast.atom(:toto, [:foo, :bar]) == :error
     end
 
     test "returns :error if unable to cast" do
-      assert Cast.atom(123) == :error
+      assert Cast.atom(123, [:foo, :bar]) == :error
+    end
+  end
+
+  describe "atom_unchecked/1" do
+    test "returns casted value" do
+      assert Cast.atom_unchecked("string") == :string
+    end
+
+    test "returns original value" do
+      assert Cast.atom_unchecked(:atom_unchecked) == :atom_unchecked
+    end
+
+    test "returns :error if unable to cast" do
+      assert Cast.atom_unchecked(123) == :error
     end
   end
 

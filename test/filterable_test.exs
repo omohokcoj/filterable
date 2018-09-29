@@ -61,12 +61,12 @@ defmodule FilterableTest do
 
     test "returns error if sort direction invalid" do
       {:error, message} = apply_filters(User, %{sort: :name, order: :test})
-      assert message == "Unable to sort using :test, only 'asc' and 'desc' allowed"
+      assert message == "Unable to sort using \"test\", only 'asc' and 'desc' allowed"
     end
 
     test "raises error if sort field invalid" do
       {:error, message} = apply_filters(User, %{sort: :test, order: :desc})
-      assert message == "Unable to sort on :test, only name and surname allowed"
+      assert message == "Unable to sort on \"test\", only name and surname allowed"
     end
   end
 

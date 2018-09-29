@@ -200,6 +200,14 @@ defmodule Filterable.Params do
     nil
   end
 
+  defp cast(value, :atom) do
+    cast(value, :atom_unchecked)
+  end
+
+  defp cast(value, {:atom, checked_values}) do
+    Filterable.Cast.atom(value, checked_values)
+  end
+
   defp cast(value, cast) when is_atom(cast) do
     apply(Filterable.Cast, cast, [value])
   end
