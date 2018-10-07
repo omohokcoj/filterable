@@ -70,7 +70,7 @@ defmodule Filterable.Cast do
     to_string(value)
   end
 
-  @spec atom(String.t() | atom, List.t(atom)) :: atom | :error
+  @spec atom(String.t() | atom, list(atom)) :: atom | :error
   def atom(value, checked_values) when is_binary(value) do
     case Enum.find(checked_values, &(Atom.to_string(&1) == value)) do
       nil -> :error
