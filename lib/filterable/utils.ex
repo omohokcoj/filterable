@@ -33,4 +33,9 @@ defmodule Filterable.Utils do
   @spec ensure_atom(String.t() | atom) :: atom
   def ensure_atom(value) when is_bitstring(value), do: String.to_atom(value)
   def ensure_atom(value) when is_atom(value), do: value
+
+  @spec ensure_string(String.t() | atom) :: String.t()
+  def ensure_string(nil), do: nil
+  def ensure_string(value) when is_bitstring(value), do: value
+  def ensure_string(value) when is_atom(value), do: Atom.to_string(value)
 end

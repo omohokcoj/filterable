@@ -8,9 +8,9 @@ defmodule Filterable.Params do
 
   @spec filter_value(map | Keyword.t(), Keyword.t()) :: {:ok | :error, any}
   def filter_value(params, opts \\ []) do
-    with params <- Utils.to_atoms_map(params),
-         params <- fetch_params(params, Keyword.get(opts, :top_param)),
+    with params <- fetch_params(params, Keyword.get(opts, :top_param)),
          value <- fetch_value(params, Keyword.get(opts, :param)),
+         value <- Utils.to_atoms_map(value),
          value <- normalize_map(value),
          value <- trim_value(value, Keyword.get(opts, :trim)),
          value <- nilify_value(value, Keyword.get(opts, :allow_blank)),
@@ -20,12 +20,12 @@ defmodule Filterable.Params do
          do: {:ok, value}
   end
 
-  defp fetch_params(params, nil) do
-    params
-  end
-
   defp fetch_params(params, key) do
-    Map.get(params, Utils.ensure_atom(key))
+    if key do
+      fetch_value(params, key)
+    else
+      params
+    end
   end
 
   defp fetch_value(nil, _) do
@@ -35,7 +35,7 @@ defmodule Filterable.Params do
   defp fetch_value(params, key) when is_list(key) do
     if Keyword.keyword?(key) do
       Enum.into(key, %{}, fn {k, v} ->
-        {k, fetch_value(Map.get(params, k), v)}
+        {k, fetch_value(fetch_value(params, k), v)}
       end)
     else
       Enum.into(key, %{}, &{&1, fetch_value(params, &1)})
@@ -43,7 +43,13 @@ defmodule Filterable.Params do
   end
 
   defp fetch_value(params, key) when is_map(params) do
-    Map.get(params, Utils.ensure_atom(key))
+    Map.get(params, Utils.ensure_string(key)) || Map.get(params, Utils.ensure_atom(key))
+  end
+
+  defp fetch_value(params, key) when is_list(params) do
+    if Keyword.keyword?(params) do
+      Keyword.get(params, key)
+    end
   end
 
   defp fetch_value(_, _) do

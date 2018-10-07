@@ -59,12 +59,26 @@ defmodule Filterable.UtilsTest do
       assert Utils.ensure_atom(:test) == :test
     end
 
-    test "when value is bitsring" do
+    test "when value is bitstring" do
       assert Utils.ensure_atom("test") == :test
     end
 
     test "when value is nil" do
       assert Utils.ensure_atom(nil) == nil
+    end
+  end
+
+  describe "ensure_string/1" do
+    test "when value is atom" do
+      assert Utils.ensure_string(:test) == "test"
+    end
+
+    test "when value is bitstring" do
+      assert Utils.ensure_string("test") == "test"
+    end
+
+    test "when value is nil" do
+      assert Utils.ensure_string(nil) == nil
     end
   end
 end
