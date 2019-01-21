@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.7.1
+
+- Fix `false` value filtering (#12)
+
 ### 0.7.0
 
 - Fix params `to_atoms_map` can cause a memory leak (#11)
