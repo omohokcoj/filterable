@@ -15,6 +15,7 @@ defmodule Filterable.Repo.Migrations.CreateUsers do
       add :weight,         :float
       add :age,            :integer
       add :latlng,         {:array, :float}
+      add :subscribed,     :boolean
 
       timestamps()
     end

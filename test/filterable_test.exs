@@ -21,6 +21,24 @@ defmodule FilterableTest do
     end
   end
 
+  describe "subscribed" do
+    test "with `true` value" do
+      {:ok, query, _} = apply_filters(User, subscribed: true)
+      result = Repo.all(query)
+
+      assert length(result) == 2
+      assert List.first(result).subscribed == true
+    end
+
+    test "with `false` value" do
+      {:ok, query, _} = apply_filters(User, subscribed: false)
+      result = Repo.all(query)
+
+      assert length(result) == 4
+      assert List.first(result).subscribed == false
+    end
+  end
+
   describe "position" do
     test "returns user with position" do
       {:ok, query, _} = apply_filters(User, position: %{lat: 34, lng: -80})

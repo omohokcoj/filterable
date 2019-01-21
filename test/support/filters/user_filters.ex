@@ -7,6 +7,8 @@ defmodule Filterable.UserFilters do
   import Ecto.Query
 
   field :name
+  field :subscribed
+
   orderable [:name, :surname]
   paginateable per_page: 4
 

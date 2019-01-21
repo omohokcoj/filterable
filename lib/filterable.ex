@@ -112,13 +112,14 @@ defmodule Filterable do
 
       share = Keyword.get(options, :share)
       allow_nil = Keyword.get(options, :allow_nil)
+      has_value = value != nil
 
       try do
         cond do
-          (allow_nil || value) && share ->
+          (allow_nil || has_value) && share ->
             apply(module, filter_name, [queryable, value, share])
 
-          allow_nil || value ->
+          allow_nil || has_value ->
             apply(module, filter_name, [queryable, value])
 
           true ->

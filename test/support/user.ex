@@ -30,6 +30,7 @@ defmodule Filterable.User do
     field :weight, :float
     field :age, :integer
     field :latlng, {:array, :float}
+    field :subscribed, :boolean
 
     timestamps()
   end

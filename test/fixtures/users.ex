@@ -15,7 +15,8 @@ defmodule Filterable.Fixtures.Users do
       state: "VT",
       street_address: "3224 Selah Way",
       surname: "Mejia",
-      weight: 89.9
+      weight: 89.9,
+      subscribed: true
     },
     %{
       id: 2,
@@ -30,7 +31,8 @@ defmodule Filterable.Fixtures.Users do
       state: "WV",
       street_address: "3107 Columbia Mine Road",
       surname: "Judson",
-      weight: 90.5
+      weight: 90.5,
+      subscribed: false
     },
     %{
       id: 3,
@@ -45,7 +47,8 @@ defmodule Filterable.Fixtures.Users do
       state: "CA",
       street_address: "684 Gateway Avenue",
       surname: "Chaney",
-      weight: 87.9
+      weight: 87.9,
+      subscribed: false
     },
     %{
       id: 4,
@@ -60,7 +63,8 @@ defmodule Filterable.Fixtures.Users do
       state: "TN",
       street_address: "4782 Lightning Point Drive",
       surname: "Smith",
-      weight: 92.2
+      weight: 92.2,
+      subscribed: false
     },
     %{
       id: 5,
@@ -75,7 +79,8 @@ defmodule Filterable.Fixtures.Users do
       state: "MI",
       street_address: "2603 Shingleton Road",
       surname: "Lewis",
-      weight: 101.2
+      weight: 101.2,
+      subscribed: false
     },
     %{
       id: 6,
@@ -90,7 +95,8 @@ defmodule Filterable.Fixtures.Users do
       state: "LA",
       street_address: "21 Washburn Street",
       surname: "Valentine",
-      weight: 78.0
+      weight: 78.0,
+      subscribed: false
     },
     %{
       id: 7,
@@ -105,7 +111,8 @@ defmodule Filterable.Fixtures.Users do
       state: "AR",
       street_address: "3792 Green Hill Road",
       surname: "Crowley",
-      weight: 60.9
+      weight: 60.9,
+      subscribed: false
     },
     %{
       id: 8,
@@ -120,7 +127,8 @@ defmodule Filterable.Fixtures.Users do
       state: "AK",
       street_address: "553 Timbercrest Road",
       surname: "Sparks",
-      weight: 97.1
+      weight: 97.1,
+      subscribed: false
     },
     %{
       id: 9,
@@ -135,7 +143,8 @@ defmodule Filterable.Fixtures.Users do
       state: "SC",
       street_address: "1342 Java Lane",
       surname: "Davis",
-      weight: 95.0
+      weight: 95.0,
+      subscribed: false
     },
     %{
       id: 10,
@@ -150,7 +159,8 @@ defmodule Filterable.Fixtures.Users do
       state: "GA",
       street_address: "1532 Smith Road",
       surname: "Keyes",
-      weight: 63.7
+      weight: 63.7,
+      subscribed: true
     }
   ]
 
