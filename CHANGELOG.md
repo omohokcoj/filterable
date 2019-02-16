@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.7.2
+
+- Fix ecto `order` helper error messages
+
 ### 0.7.1
 
 - Fix `false` value filtering (#12)
