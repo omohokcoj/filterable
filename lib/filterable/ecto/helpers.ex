@@ -69,7 +69,8 @@ defmodule Filterable.Ecto.Helpers do
       end
 
       filter sort(_, %{sort: field, order: _}) when not (field in unquote(fields)) do
-        {:error, "Unable to sort on #{inspect(field)}, only #{inspect(unquote(fields))} are allowed"}
+        {:error,
+         "Unable to sort on #{inspect(field)}, only #{inspect(unquote(fields))} are allowed"}
       end
 
       filter sort(_, %{sort: _, order: order}) when not (order in ~w(asc desc)) do
