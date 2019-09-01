@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.7.3
+
+- Add `apply!` function to return result without tuple
+
 ### 0.7.2
 
 - Fix ecto `order` helper error messages

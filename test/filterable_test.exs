@@ -41,8 +41,10 @@ defmodule FilterableTest do
 
   describe "position" do
     test "returns user with position" do
-      {:ok, query, _} = apply_filters(User, position: %{lat: 34, lng: -80})
-      result = Repo.all(query)
+      result =
+        User
+        |> Filterable.UserFilters.apply!(%{position: %{lat: 34, lng: -80}}, share: %{})
+        |> Repo.all()
 
       assert length(result) == 1
       assert List.first(result).id == 9

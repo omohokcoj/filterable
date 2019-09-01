@@ -71,7 +71,15 @@ defmodule Filterable do
     end
   end
 
-  @spec apply_filters!(any, map | Keyword.t(), module, Keyword.t()) :: any | no_return
+  @spec apply!(any, map | Keyword.t(), module, Keyword.t()) :: any | no_return
+  def apply!(queryable, params, module, opts \\ []) do
+    case apply_filters(queryable, params, module, opts) do
+      {:ok, result, _values} -> result
+      {:error, message} -> raise Filterable.FilterError, message
+    end
+  end
+
+  @spec apply_filters!(any, map | Keyword.t(), module, Keyword.t()) :: {any, map} | no_return
   def apply_filters!(queryable, params, module, opts \\ []) do
     case apply_filters(queryable, params, module, opts) do
       {:ok, result, values} -> {result, values}

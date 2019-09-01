@@ -14,6 +14,10 @@ defmodule Filterable.DSL do
 
   defmacro __before_compile__(_) do
     quote do
+      def apply!(queryable, params, opts \\ []) do
+        Filterable.apply!(queryable, params, __MODULE__, opts)
+      end
+
       def apply_filters!(queryable, params, opts \\ []) do
         Filterable.apply_filters!(queryable, params, __MODULE__, opts)
       end
@@ -32,6 +36,8 @@ defmodule Filterable.DSL do
 
       defoverridable apply_filters!: 3,
                      apply_filters!: 2,
+                     apply!: 3,
+                     apply!: 2,
                      apply_filters: 3,
                      apply_filters: 2,
                      filter_values: 2,
