@@ -1,4 +1,4 @@
 ExUnit.start()
 
-Code.load_file("test/support/filters/user_filters.ex")
-Code.load_file("test/support/user.ex")
+Code.require_file("test/support/filters/user_filters.ex")
+Code.require_file("test/support/user.ex")

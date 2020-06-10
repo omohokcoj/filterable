@@ -63,7 +63,11 @@ defmodule Filterable.Ecto.Helpers do
     fields = Enum.map(fields, &to_string/1)
 
     quote do
-      @options param: [:sort, :order], default: [order: "desc"], cast: :string, share: false
+      @options param: [:sort, :order],
+               default: [order: "desc"],
+               cast: :string,
+               share: false,
+               allowed: unquote(fields)
       filter sort(query, %{sort: nil, order: _}) do
         query
       end

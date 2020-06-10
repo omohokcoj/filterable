@@ -177,4 +177,17 @@ defmodule FilterableTest do
       end
     end
   end
+
+  describe "introspection" do
+    test "returns a list of all filters" do
+      filters = User.defined_filters()
+
+      assert filters == [
+               {:name, [share: false]},
+               {:limit, [default: 20, cast: :integer, share: false]},
+               {:offset, [default: 0, cast: :integer, share: false]},
+               {:age, [cast: :integer]}
+             ]
+    end
+  end
 end
