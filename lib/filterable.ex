@@ -46,6 +46,10 @@ defmodule Filterable do
         Keyword.merge(opts, @filter_options)
       end
 
+      def defined_filters() do
+        Filterable.defined_filters(@filters_module)
+      end
+
       defoverridable apply_filters!: 3,
                      apply_filters!: 2,
                      apply_filters: 3,
@@ -110,6 +114,11 @@ defmodule Filterable do
         error = {:error, _} -> error
       end
     end)
+  end
+
+  @spec defined_filters(module) :: [any()]
+  def defined_filters(module) do
+    module.defined_filters()
   end
 
   defp filters_result(queryable, filter_values, module, opts) do
