@@ -226,6 +226,10 @@ defmodule Filterable.Params do
     value
   end
 
+  defp cast_error_message(value: value, cast: {cast, params}) when is_atom(cast) do
+    "Unable to cast #{inspect(value)} to #{to_string(cast)} with options: #{inspect(params)}"
+  end
+
   defp cast_error_message(value: value, cast: cast) when is_function(cast) do
     "Unable to cast #{inspect(value)} using #{inspect(cast)}"
   end

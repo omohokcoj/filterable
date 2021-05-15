@@ -270,6 +270,16 @@ defmodule Filterable.ParamsTest do
                )
     end
 
+    test "returns error if unable to cast atom" do
+      assert {:error, ~s(Unable to cast "Tom" to atom with options: [:test])} =
+               filter_value(@params,
+                 param: :name,
+                 trim: true,
+                 cast: {:atom, [:test]},
+                 cast_errors: true
+               )
+    end
+
     test "doesn't return error if unable to cast blank value" do
       assert {:ok, nil} =
                filter_value(

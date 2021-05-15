@@ -1,5 +1,9 @@
 # Changelog
 
+### 0.7.4
+
+- Fix cast to atom error message (#16)
+
 ### 0.7.3
 
 - Add `apply!` function to return result without tuple
