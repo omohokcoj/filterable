@@ -46,7 +46,7 @@ defmodule Filterable do
         Keyword.merge(opts, @filter_options)
       end
 
-      defdelegate defined_filters(), to: @filters_module
+      defdelegate defined_filters(), to: @filters_module, as: :defined_filters
 
       defoverridable apply_filters!: 3,
                      apply_filters!: 2,
